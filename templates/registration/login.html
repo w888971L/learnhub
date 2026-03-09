@@ -1,0 +1,75 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Log In — LearnHub{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-sm">
+    <div class="text-center mb-8">
+      <svg class="mx-auto h-10 w-10 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+      <h1 class="mt-4 text-2xl font-bold text-gray-900">Welcome back</h1>
+      <p class="mt-1 text-sm text-gray-500">Log in to your LearnHub account.</p>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+      {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-5">
+          <ul class="text-sm text-red-700 space-y-1">
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'login' %}" novalidate>
+        {% csrf_token %}
+        {% if next %}
+          <input type="hidden" name="next" value="{{ next }}" />
+        {% endif %}
+
+        <!-- Username -->
+        <div class="mb-4">
+          <label for="id_username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <input type="text" id="id_username" name="username" value="{{ form.username.value|default:'' }}" required autofocus
+            class="w-full border {% if form.username.errors %}border-red-300{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-shadow"
+            placeholder="Enter your username" />
+          {% if form.username.errors %}
+            <p class="mt-1 text-xs text-red-600">{{ form.username.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div class="mb-4">
+          <label for="id_password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input type="password" id="id_password" name="password" required
+            class="w-full border {% if form.password.errors %}border-red-300{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-shadow"
+            placeholder="Enter your password" />
+          {% if form.password.errors %}
+            <p class="mt-1 text-xs text-red-600">{{ form.password.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Remember me -->
+        <div class="flex items-center justify-between mb-6">
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" name="remember_me" class="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500" />
+            <span class="text-sm text-gray-600">Remember me</span>
+          </label>
+        </div>
+
+        <button type="submit" class="w-full px-4 py-2.5 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm">
+          Log In
+        </button>
+      </form>
+    </div>
+
+    <p class="mt-6 text-center text-sm text-gray-500">
+      Don't have an account?
+      <a href="{% url 'register' %}" class="text-brand-600 hover:text-brand-800 font-medium transition-colors">Sign up</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

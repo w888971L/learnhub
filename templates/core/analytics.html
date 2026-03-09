@@ -1,0 +1,269 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Analytics — {{ course.title }} — LearnHub{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Page header -->
+  <div class="mb-8">
+    <nav class="text-sm text-gray-500 mb-1">
+      <a href="{% url 'course_detail' course.pk %}" class="hover:text-brand-600 transition-colors">{{ course.title }}</a>
+      <span class="mx-1">/</span>
+      <span class="text-gray-900">Analytics</span>
+    </nav>
+    <h1 class="text-2xl font-bold text-gray-900">Course Analytics</h1>
+    <p class="mt-1 text-sm text-gray-500">Performance data and insights for {{ course.title }}.</p>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white border border-gray-200 rounded-xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">Average Grade</p>
+          <p class="text-3xl font-bold text-gray-900 mt-1">{{ analytics.avg_grade|floatformat:1|default:"--" }}<span class="text-lg text-gray-400">%</span></p>
+        </div>
+        <div class="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center">
+          <svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" /></svg>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">Completion Rate</p>
+          <p class="text-3xl font-bold text-gray-900 mt-1">{{ analytics.completion_rate|floatformat:0|default:"0" }}<span class="text-lg text-gray-400">%</span></p>
+        </div>
+        <div class="h-12 w-12 rounded-full bg-green-50 flex items-center justify-center">
+          <svg class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">Active Students</p>
+          <p class="text-3xl font-bold text-gray-900 mt-1">{{ analytics.active_students|default:0 }}</p>
+        </div>
+        <div class="h-12 w-12 rounded-full bg-purple-50 flex items-center justify-center">
+          <svg class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">Total Submissions</p>
+          <p class="text-3xl font-bold text-gray-900 mt-1">{{ analytics.total_submissions|default:0 }}</p>
+        </div>
+        <div class="h-12 w-12 rounded-full bg-amber-50 flex items-center justify-center">
+          <svg class="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Grade distribution chart -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Grade Distribution</h2>
+      <div class="relative" style="height: 280px;">
+        <canvas id="grade-distribution-chart"
+          data-labels='["A (90-100)", "B (80-89)", "C (70-79)", "D (60-69)", "F (0-59)"]'
+          data-values='[{{ analytics.grade_dist_a|default:0 }}, {{ analytics.grade_dist_b|default:0 }}, {{ analytics.grade_dist_c|default:0 }}, {{ analytics.grade_dist_d|default:0 }}, {{ analytics.grade_dist_f|default:0 }}]'
+          data-colors='["#22c55e", "#3b82f6", "#f59e0b", "#f97316", "#ef4444"]'>
+        </canvas>
+      </div>
+      <noscript>
+        <div class="space-y-2 mt-4">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-600">A (90-100)</span>
+            <span class="font-medium">{{ analytics.grade_dist_a|default:0 }} students</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-600">B (80-89)</span>
+            <span class="font-medium">{{ analytics.grade_dist_b|default:0 }} students</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-600">C (70-79)</span>
+            <span class="font-medium">{{ analytics.grade_dist_c|default:0 }} students</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-600">D (60-69)</span>
+            <span class="font-medium">{{ analytics.grade_dist_d|default:0 }} students</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-600">F (0-59)</span>
+            <span class="font-medium">{{ analytics.grade_dist_f|default:0 }} students</span>
+          </div>
+        </div>
+      </noscript>
+    </div>
+
+    <!-- Submission timeline chart -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Submission Activity (Last 14 Days)</h2>
+      <div class="relative" style="height: 280px;">
+        <canvas id="submission-timeline-chart"
+          data-labels='{{ analytics.timeline_labels|default:"[]" }}'
+          data-values='{{ analytics.timeline_values|default:"[]" }}'>
+        </canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assignment performance table -->
+  <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">Assignment Performance</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Assignment</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Avg Score</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Submission Rate</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Late Rate</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for perf in assignment_performance %}
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4">
+                <p class="text-sm font-medium text-gray-900">{{ perf.title }}</p>
+                <p class="text-xs text-gray-500">Due {{ perf.due_date|date:"M d, Y" }}</p>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm font-medium text-gray-900">{{ perf.avg_score|floatformat:1 }}%</span>
+                  <div class="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full {% if perf.avg_score >= 80 %}bg-green-500{% elif perf.avg_score >= 60 %}bg-yellow-500{% else %}bg-red-500{% endif %}"
+                         style="width: {{ perf.avg_score|floatformat:0 }}%"></div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <span class="text-sm text-gray-700">{{ perf.submission_count }}/{{ perf.total_students }} ({{ perf.submission_rate|floatformat:0 }}%)</span>
+              </td>
+              <td class="px-6 py-4">
+                <span class="text-sm {% if perf.late_rate > 20 %}text-red-600 font-medium{% else %}text-gray-700{% endif %}">
+                  {{ perf.late_rate|floatformat:0 }}%
+                </span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">No assignment data available yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Student progress list -->
+  <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">Student Progress</h2>
+    </div>
+    <div class="divide-y divide-gray-100">
+      {% for student in student_progress %}
+        <div class="px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+          <div class="flex items-center space-x-3 sm:w-56 flex-shrink-0">
+            <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xs font-semibold">
+              {{ student.first_name|truncatechars:1|upper }}{{ student.last_name|truncatechars:1|upper }}
+            </div>
+            <p class="text-sm font-medium text-gray-900 truncate">{{ student.get_full_name }}</p>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center space-x-3">
+              <div class="flex-1 h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-300
+                  {% if student.progress >= 80 %}bg-green-500{% elif student.progress >= 50 %}bg-blue-500{% elif student.progress >= 25 %}bg-yellow-500{% else %}bg-red-500{% endif %}"
+                  style="width: {{ student.progress|floatformat:0 }}%"></div>
+              </div>
+              <span class="text-xs text-gray-500 w-10 text-right flex-shrink-0">{{ student.progress|floatformat:0 }}%</span>
+            </div>
+          </div>
+          <div class="sm:w-24 text-right flex-shrink-0">
+            <span class="text-sm font-semibold {% if student.current_grade >= 80 %}text-green-700{% elif student.current_grade >= 60 %}text-amber-700{% else %}text-red-700{% endif %}">
+              {{ student.current_grade|floatformat:1 }}%
+            </span>
+          </div>
+        </div>
+      {% empty %}
+        <div class="px-6 py-8 text-center text-sm text-gray-500">No student data available yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Grade distribution chart
+    const distCanvas = document.getElementById('grade-distribution-chart');
+    if (distCanvas && typeof Chart !== 'undefined') {
+      const labels = JSON.parse(distCanvas.dataset.labels);
+      const values = JSON.parse(distCanvas.dataset.values);
+      const colors = JSON.parse(distCanvas.dataset.colors);
+      new Chart(distCanvas, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Students',
+            data: values,
+            backgroundColor: colors,
+            borderRadius: 6,
+            barThickness: 40
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+          }
+        }
+      });
+    }
+
+    // Submission timeline chart
+    const timeCanvas = document.getElementById('submission-timeline-chart');
+    if (timeCanvas && typeof Chart !== 'undefined') {
+      const labels = JSON.parse(timeCanvas.dataset.labels || '[]');
+      const values = JSON.parse(timeCanvas.dataset.values || '[]');
+      new Chart(timeCanvas, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Submissions',
+            data: values,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+            pointBackgroundColor: '#3b82f6'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+          }
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

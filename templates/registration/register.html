@@ -1,0 +1,104 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Sign Up — LearnHub{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <svg class="mx-auto h-10 w-10 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+      <h1 class="mt-4 text-2xl font-bold text-gray-900">Create your account</h1>
+      <p class="mt-1 text-sm text-gray-500">Join LearnHub to start learning or teaching.</p>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+      {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-5">
+          <ul class="text-sm text-red-700 space-y-1">
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'register' %}" novalidate>
+        {% csrf_token %}
+
+        <!-- Username -->
+        <div class="mb-4">
+          <label for="id_username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <input type="text" id="id_username" name="username" value="{{ form.username.value|default:'' }}" required autofocus
+            class="w-full border {% if form.username.errors %}border-red-300{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-shadow" />
+          {% if form.username.errors %}
+            <p class="mt-1 text-xs text-red-600">{{ form.username.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Email -->
+        <div class="mb-4">
+          <label for="id_email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" id="id_email" name="email" value="{{ form.email.value|default:'' }}" required
+            class="w-full border {% if form.email.errors %}border-red-300{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-shadow" />
+          {% if form.email.errors %}
+            <p class="mt-1 text-xs text-red-600">{{ form.email.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div class="mb-4">
+          <label for="id_password1" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input type="password" id="id_password1" name="password1" required
+            class="w-full border {% if form.password1.errors %}border-red-300{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-shadow" />
+          {% if form.password1.errors %}
+            <p class="mt-1 text-xs text-red-600">{{ form.password1.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Confirm password -->
+        <div class="mb-4">
+          <label for="id_password2" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+          <input type="password" id="id_password2" name="password2" required
+            class="w-full border {% if form.password2.errors %}border-red-300{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-shadow" />
+          {% if form.password2.errors %}
+            <p class="mt-1 text-xs text-red-600">{{ form.password2.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Role selector -->
+        <div class="mb-4">
+          <label for="id_role" class="block text-sm font-medium text-gray-700 mb-1">I am a</label>
+          <select id="id_role" name="role"
+            class="w-full border {% if form.role.errors %}border-red-300{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white">
+            <option value="student" {% if form.role.value == 'student' %}selected{% endif %}>Student</option>
+            <option value="instructor" {% if form.role.value == 'instructor' %}selected{% endif %}>Instructor</option>
+          </select>
+          {% if form.role.errors %}
+            <p class="mt-1 text-xs text-red-600">{{ form.role.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Organization (optional) -->
+        <div class="mb-6">
+          <label for="id_organization" class="block text-sm font-medium text-gray-700 mb-1">
+            Organization <span class="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <input type="text" id="id_organization" name="organization" value="{{ form.organization.value|default:'' }}" placeholder="University or company name"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-shadow" />
+        </div>
+
+        <button type="submit" class="w-full px-4 py-2.5 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm">
+          Create Account
+        </button>
+      </form>
+    </div>
+
+    <p class="mt-6 text-center text-sm text-gray-500">
+      Already have an account?
+      <a href="{% url 'login' %}" class="text-brand-600 hover:text-brand-800 font-medium transition-colors">Log in</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,291 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ course.title }} — LearnHub{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Course header -->
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
+    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <h1 class="text-2xl font-bold text-gray-900">{{ course.title }}</h1>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+            {% if course.status == 'published' %}bg-green-100 text-green-800
+            {% elif course.status == 'draft' %}bg-yellow-100 text-yellow-800
+            {% elif course.status == 'archived' %}bg-gray-100 text-gray-600
+            {% else %}bg-blue-100 text-blue-800{% endif %}">
+            {{ course.get_status_display|default:course.status|title }}
+          </span>
+        </div>
+        <p class="text-sm text-gray-500 mb-3">
+          Taught by <span class="font-medium text-gray-700">{{ course.instructor.get_full_name|default:course.instructor.username }}</span>
+        </p>
+        <p class="text-gray-600 text-sm leading-relaxed">{{ course.description }}</p>
+        <div class="flex flex-wrap gap-4 mt-4 text-sm text-gray-500">
+          <span class="flex items-center">
+            <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
+            {{ course.enrollment_count }}/{{ course.max_enrollment }} enrolled
+          </span>
+          <span class="flex items-center">
+            <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
+            {{ course.module_count|default:0 }} modules
+          </span>
+        </div>
+      </div>
+
+      <!-- Enrollment / Instructor actions -->
+      <div class="flex flex-col gap-2 lg:min-w-[180px]">
+        {% if is_instructor and course.instructor == user %}
+          <a href="{% url 'course_edit' course.pk %}" class="inline-flex items-center justify-center px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors">
+            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+            Edit Course
+          </a>
+          <a href="{% url 'course_modules_manage' course.pk %}" class="inline-flex items-center justify-center px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+            Manage Modules
+          </a>
+        {% elif enrollment %}
+          <div class="text-center">
+            <span class="inline-flex items-center px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm font-medium border border-green-200 mb-2">
+              <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              Enrolled
+            </span>
+            <form method="post" action="{% url 'course_drop' course.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="w-full px-4 py-2 text-red-600 border border-red-200 bg-red-50 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
+                      onclick="return confirm('Are you sure you want to drop this course?')">
+                Drop Course
+              </button>
+            </form>
+          </div>
+        {% else %}
+          <form method="post" action="{% url 'course_enroll' course.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="w-full px-6 py-2.5 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm">
+              Enroll Now
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Main content area -->
+    <div class="flex-1 min-w-0">
+      <!-- Tab navigation -->
+      <div class="border-b border-gray-200 mb-6">
+        <nav class="flex space-x-8 -mb-px" id="course-tabs">
+          <button data-tab="modules" class="tab-btn border-b-2 border-brand-600 text-brand-600 px-1 py-3 text-sm font-medium">Modules</button>
+          <button data-tab="assignments" class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 px-1 py-3 text-sm font-medium">Assignments</button>
+          <button data-tab="discussions" class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 px-1 py-3 text-sm font-medium">Discussions</button>
+          {% if is_instructor and course.instructor == user %}
+            <button data-tab="analytics" class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 px-1 py-3 text-sm font-medium">Analytics</button>
+          {% endif %}
+        </nav>
+      </div>
+
+      <!-- Modules tab -->
+      <div id="tab-modules" class="tab-panel">
+        {% if modules %}
+          <div class="space-y-3">
+            {% for module in modules %}
+              <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <button onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('rotate-90')"
+                        class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50 transition-colors">
+                  <div class="flex items-center space-x-3">
+                    <span class="flex items-center justify-center h-7 w-7 rounded-full bg-brand-100 text-brand-700 text-xs font-bold">{{ module.order }}</span>
+                    <h3 class="text-sm font-semibold text-gray-900">{{ module.title }}</h3>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <span class="text-xs text-gray-500">{{ module.lessons.count }} lessons</span>
+                    <svg class="chevron h-4 w-4 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                  </div>
+                </button>
+                <div class="hidden border-t border-gray-100">
+                  <ul class="divide-y divide-gray-100">
+                    {% for lesson in module.lessons.all %}
+                      <li>
+                        <a href="{% url 'lesson_detail' course.pk module.pk lesson.pk %}" class="flex items-center px-5 py-3 hover:bg-gray-50 transition-colors">
+                          <!-- Type icon -->
+                          {% if lesson.lesson_type == 'video' %}
+                            <svg class="h-5 w-5 text-purple-500 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z" /></svg>
+                          {% elif lesson.lesson_type == 'reading' %}
+                            <svg class="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                          {% elif lesson.lesson_type == 'quiz' %}
+                            <svg class="h-5 w-5 text-green-500 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>
+                          {% else %}
+                            <svg class="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" /></svg>
+                          {% endif %}
+                          <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">{{ lesson.title }}</p>
+                          </div>
+                          {% if lesson.duration_minutes %}
+                            <span class="text-xs text-gray-500 ml-3">{{ lesson.duration_minutes }} min</span>
+                          {% endif %}
+                          {% if lesson.is_completed %}
+                            <svg class="h-5 w-5 text-green-500 ml-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" /></svg>
+                          {% endif %}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-12 text-gray-500">
+            <p class="text-sm">No modules have been added to this course yet.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Assignments tab -->
+      <div id="tab-assignments" class="tab-panel hidden">
+        {% if assignments %}
+          <div class="space-y-3">
+            {% for assignment in assignments %}
+              <a href="{% url 'assignment_detail' course.pk assignment.pk %}" class="block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h4 class="text-sm font-semibold text-gray-900">{{ assignment.title }}</h4>
+                    <p class="text-xs text-gray-500 mt-1">Due {{ assignment.due_date|date:"M d, Y g:i A" }} &middot; {{ assignment.max_score }} points</p>
+                  </div>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                    {% if assignment.submission_status == 'graded' %}bg-green-100 text-green-800
+                    {% elif assignment.submission_status == 'submitted' %}bg-blue-100 text-blue-800
+                    {% elif assignment.submission_status == 'late' %}bg-red-100 text-red-800
+                    {% else %}bg-gray-100 text-gray-600{% endif %}">
+                    {{ assignment.submission_status|default:"Not submitted"|title }}
+                  </span>
+                </div>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-12 text-gray-500">
+            <p class="text-sm">No assignments yet.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Discussions tab -->
+      <div id="tab-discussions" class="tab-panel hidden">
+        <div class="flex justify-end mb-4">
+          <a href="{% url 'discussion_create' course.pk %}" class="inline-flex items-center px-3 py-1.5 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors">
+            New Thread
+          </a>
+        </div>
+        {% if discussions %}
+          <div class="space-y-2">
+            {% for thread in discussions %}
+              <a href="{% url 'discussion_detail' course.pk thread.pk %}" class="block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                      {% if thread.is_pinned %}
+                        <svg class="h-4 w-4 text-amber-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
+                      {% endif %}
+                      <h4 class="text-sm font-semibold text-gray-900 truncate">{{ thread.title }}</h4>
+                      {% if thread.is_locked %}
+                        <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+                      {% endif %}
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">{{ thread.author.get_full_name|default:thread.author.username }} &middot; {{ thread.last_activity|timesince }} ago</p>
+                  </div>
+                  <span class="text-xs text-gray-500 ml-4">{{ thread.reply_count }} replies</span>
+                </div>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-12 text-gray-500">
+            <p class="text-sm">No discussion threads yet. Start the conversation!</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Analytics tab (instructor only) -->
+      {% if is_instructor and course.instructor == user %}
+        <div id="tab-analytics" class="tab-panel hidden">
+          <div class="text-center py-12">
+            <a href="{% url 'course_analytics' course.pk %}" class="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors">
+              View Full Analytics
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="lg:w-80 flex-shrink-0 space-y-6">
+      <!-- Quick stats -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4">Quick Stats</h3>
+        <dl class="space-y-3">
+          <div class="flex justify-between text-sm">
+            <dt class="text-gray-500">Enrolled</dt>
+            <dd class="font-medium text-gray-900">{{ course.enrollment_count }}</dd>
+          </div>
+          <div class="flex justify-between text-sm">
+            <dt class="text-gray-500">Modules</dt>
+            <dd class="font-medium text-gray-900">{{ course.module_count|default:0 }}</dd>
+          </div>
+          <div class="flex justify-between text-sm">
+            <dt class="text-gray-500">Assignments</dt>
+            <dd class="font-medium text-gray-900">{{ course.assignment_count|default:0 }}</dd>
+          </div>
+          {% if enrollment %}
+            <div class="flex justify-between text-sm">
+              <dt class="text-gray-500">Your Grade</dt>
+              <dd class="font-medium text-gray-900">{{ enrollment.current_grade|default:"--" }}%</dd>
+            </div>
+          {% endif %}
+        </dl>
+      </div>
+
+      <!-- Recent activity -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4">Recent Activity</h3>
+        {% if recent_activity %}
+          <ul class="space-y-3">
+            {% for activity in recent_activity %}
+              <li class="flex items-start space-x-3">
+                <div class="flex-shrink-0 mt-0.5">
+                  <div class="h-2 w-2 rounded-full bg-brand-400"></div>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm text-gray-700">{{ activity.description }}</p>
+                  <p class="text-xs text-gray-500 mt-0.5">{{ activity.created_at|timesince }} ago</p>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-sm text-gray-500">No recent activity.</p>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('border-brand-600', 'text-brand-600');
+        b.classList.add('border-transparent', 'text-gray-500');
+      });
+      btn.classList.add('border-brand-600', 'text-brand-600');
+      btn.classList.remove('border-transparent', 'text-gray-500');
+
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+    });
+  });
+</script>
+{% endblock %}

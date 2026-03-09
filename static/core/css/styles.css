@@ -1,0 +1,14 @@
+/* LearnHub — Custom styles (supplements Tailwind CDN) */
+/* Most styling is handled by Tailwind utility classes in templates */
+
+/* Smooth transitions for interactive elements */
+.transition-smooth {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Grade color classes (used by grade_color template filter) */
+.grade-a { color: #059669; }  /* green-600 */
+.grade-b { color: #2563eb; }  /* blue-600 */
+.grade-c { color: #d97706; }  /* amber-600 */
+.grade-d { color: #ea580c; }  /* orange-600 */
+.grade-f { color: #dc2626; }  /* red-600 */
