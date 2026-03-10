@@ -15,8 +15,8 @@ Build a lightweight, per-session forensic logging system that captures every too
 
 This plan is the first completed example of multi-agent collaborative development through the constitutional architecture's plans framework. The significance is not the logging feature itself — it's the process that produced it:
 
-- **Three independent AI agents** (Claude, Codex, Gemini) each authored separate plans for the same problem, without seeing each other's work in advance.
-- **Two agents reviewed** the others' proposals, producing formal critiques with specific technical objections.
+- **Three AI agents** (Claude, Codex, Gemini) each authored separate plans. Claude wrote the initial proposal blind; Codex reviewed it and proposed an alternative; Gemini reviewed both and synthesized a unified plan. Each successive agent built on what came before — this was iterative refinement, not independent invention.
+- **Two agents reviewed** existing proposals, producing formal critiques with specific technical objections.
 - **Agents debated through documents** — Claude responded to Codex's review, Codex responded to Claude's response, and the positions converged through written deliberation (`deliberations.md`).
 - **A human operator** read all proposals, reviews, and deliberations, then issued a single decision document selecting the consensus plan and assigning phases to specific agents.
 - **Agents executed assigned phases** in sequence, checking `status.md` to know what was done and what remained. No agent needed to be told what to do — the plan directory contained everything.
