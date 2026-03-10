@@ -164,13 +164,14 @@ The most consequential design changes came from inter-agent review, not from the
 
 | Behavior | Claude | Codex | Gemini |
 |----------|--------|-------|--------|
-| Committed own work | Yes | No (left uncommitted) | No (left uncommitted) |
 | Updated charter (living docs) | N/A (Phase 1) | Yes | No |
 | Updated .gitignore | Yes | Yes | No |
 | Used real commit hashes in status.md | Yes | Left blank (correct) | Wrote fake hashes |
 | Duplicate event bug | No | No | Yes (double session_start) |
 
-This is a genuine finding for the control study: agents exhibit different levels of process compliance even when following the same plan and constitution. Codex was strongest on documentation discipline. Claude was strongest on commit discipline. Gemini was fastest to complete but cut corners on process artifacts.
+Note: commit behavior is excluded from this comparison. Codex and Gemini were never instructed on commit workflow — both default to writing local files, with commits handled by the human operator or a reviewing agent. This is a platform/process gap, not a discipline issue.
+
+This is a genuine finding for the control study: agents exhibit different levels of process compliance even when following the same plan and constitution. Codex was strongest on documentation discipline (charter updates, gitignore). Gemini was fastest to complete but cut corners on process artifacts.
 
 ### 5.3 Each agent solved the capture problem differently
 
