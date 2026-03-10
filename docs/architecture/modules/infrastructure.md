@@ -1,7 +1,7 @@
 # Infrastructure — routing, middleware, utilities, management commands
 
-Last verified: 2026-03-09
-Files covered: core/urls.py, core/views.py, core/forms.py, core/admin.py, core/middleware.py, core/context_processors.py, core/templatetags/core_tags.py, core/utils/, core/management/commands/
+Last verified: 2026-03-10
+Files covered: core/urls.py, core/views.py, core/forms.py, core/admin.py, core/middleware.py, core/context_processors.py, core/templatetags/core_tags.py, core/utils/, core/management/commands/, scripts/classify.py, scripts/session_log_schema.py, scripts/extract_codex_log.py
 
 ---
 
@@ -161,3 +161,19 @@ Notable: GradeForm has custom `clean_score` that validates `0 <= score <= max_sc
 - `time_ago` filter — human-readable relative time
 - `notification_badge` inclusion tag — renders badge with unread count
 - `role_badge` simple tag — returns colored HTML badge for user role
+---
+
+## Session Logging Scripts (scripts/)
+
+### classify.py
+Shared path classification for governance, flow, experiment, and code files.
+Imported by analyzers and logging/extraction scripts to keep "charter hit" logic consistent across agents.
+
+### session_log_schema.py
+Defines the shared `ToolEvent` JSONL schema and canonical event types used by Claude, Codex, and Gemini logging work.
+Supports multi-file events via `file_paths` and auto-classifies `file_classes`.
+
+### extract_codex_log.py
+Reads Codex CLI session transcripts and emits normalized per-session logs to `.codex/logs/tool-use-{session_id}.jsonl`.
+Captures `session_start`, `tool_success`, `tool_failure`, and `session_end` from `session_meta`, `function_call` / `function_call_output`, and `custom_tool_call` / `custom_tool_call_output` records.
+! Failures are inferred from actual transcript outputs (non-zero exit codes or custom-tool metadata). Unmatched calls are not logged as successes.
