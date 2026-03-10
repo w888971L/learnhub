@@ -55,16 +55,17 @@ def find_latest_codex_session() -> Path | None:
     return sessions[-1] if sessions else None
 
 
-def find_latest_gemini_session() -> Path | None:
-    """Find the most recent Gemini session transcript for this project."""
-    # Try project-specific chats directory
-    for project_name in ["learnhub", "learnhub2"]:
+def find_latest_gemini_session(project: str | None = None) -> Path | None:
+    """Find the most recent Gemini session transcript for a project."""
+    project_names = [project] if project else ["learnhub", "learnhub2"]
+    latest = None
+    for project_name in project_names:
         chats_dir = GEMINI_CHATS_BASE / project_name / "chats"
         if chats_dir.exists():
             sessions = sorted(chats_dir.glob("session-*.json"), key=lambda p: p.stat().st_mtime)
-            if sessions:
-                return sessions[-1]
-    return None
+            if sessions and (latest is None or sessions[-1].stat().st_mtime > latest.stat().st_mtime):
+                latest = sessions[-1]
+    return latest
 
 
 def extract_codex(session_path: Path) -> Path | None:
@@ -127,7 +128,8 @@ def run_analysis(log_path: Path, output_json: bool = False) -> dict | str | None
     return result.stdout
 
 
-def process_agent(agent: str, output_json: bool = False) -> tuple[str, str | dict | None]:
+def process_agent(agent: str, output_json: bool = False,
+                   project: str | None = None) -> tuple[str, str | dict | None]:
     """Process a single agent: find, extract if needed, analyze. Returns (agent, result)."""
     log_path = None
 
@@ -146,9 +148,10 @@ def process_agent(agent: str, output_json: bool = False) -> tuple[str, str | dic
             return agent, "Codex extraction failed"
 
     elif agent == "gemini":
-        session = find_latest_gemini_session()
+        session = find_latest_gemini_session(project=project)
         if not session:
-            return agent, "No Gemini sessions found in ~/.gemini/tmp/*/chats/"
+            target = project or "any project"
+            return agent, f"No Gemini sessions found for {target} in ~/.gemini/tmp/*/chats/"
         print(f"Extracting Gemini session: {session.name}", file=sys.stderr)
         log_path = extract_gemini(session)
         if not log_path:
@@ -204,13 +207,16 @@ def main():
                         help="Save output to this folder instead of printing")
     parser.add_argument("--suffix",
                         help="Suffix for output filename (e.g., 'test-a-b', 'round-1')")
+    parser.add_argument("--project",
+                        help="Project name for Gemini session lookup (e.g., 'learnhub2')")
     args = parser.parse_args()
 
     agents = ["claude", "codex", "gemini"] if args.agent == "all" else [args.agent]
 
     results = {}
     for agent in agents:
-        agent_name, result = process_agent(agent, output_json=args.json)
+        agent_name, result = process_agent(agent, output_json=args.json,
+                                           project=args.project)
         results[agent_name] = result
 
     # Output
