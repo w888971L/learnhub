@@ -27,3 +27,5 @@ Thumbs.db
 
 # Claude Code
 .claude/commit_draft.md
+.claude/logs/
+.claude/settings.local.json
