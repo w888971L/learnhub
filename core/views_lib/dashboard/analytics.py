@@ -59,8 +59,8 @@ def student_dashboard(request):
         .order_by("-created_at")[:10]
     )
 
-    return render(request, "core/dashboard/student_dashboard.html", {
-        "enrollments": enrollments,
+    return render(request, "core/dashboard.html", {
+        "enrolled_courses": enrollments,
         "upcoming_assignments": upcoming_assignments,
         "recent_notifications": recent_notifications,
     })
@@ -125,7 +125,7 @@ def course_analytics(request, course_id):
             "submission_count": count,
         })
 
-    return render(request, "core/dashboard/course_analytics.html", {
+    return render(request, "core/analytics.html", {
         "course": course,
         "analytics": analytics,
         "grade_distribution": grade_distribution,

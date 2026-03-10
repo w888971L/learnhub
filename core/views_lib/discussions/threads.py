@@ -52,7 +52,7 @@ def thread_list(request, course_id):
         .order_by("-is_pinned", "-created_at")
     )
 
-    return render(request, "core/discussions/thread_list.html", {
+    return render(request, "core/thread_list.html", {
         "course": course,
         "threads": threads,
     })
@@ -82,7 +82,7 @@ def thread_create(request, course_id):
     else:
         form = ThreadForm()
 
-    return render(request, "core/discussions/thread_form.html", {
+    return render(request, "core/thread_form.html", {
         "course": course,
         "form": form,
     })
@@ -118,7 +118,7 @@ def thread_detail(request, course_id, thread_id):
 
     reply_form = PostForm()
 
-    return render(request, "core/discussions/thread_detail.html", {
+    return render(request, "core/thread_detail.html", {
         "course": course,
         "thread": thread,
         "posts": posts,

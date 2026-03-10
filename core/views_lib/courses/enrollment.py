@@ -70,7 +70,7 @@ def enroll(request, course_id):
         status=EnrollmentStatus.ACTIVE,
     )
 
-    notify_enrollment_change(enrollment)
+    notify_enrollment_change(enrollment, "enrolled")
 
     messages.success(request, f"Successfully enrolled in {course.title}.")
     return redirect("core:course_detail", course_id=course.pk)
@@ -100,7 +100,7 @@ def drop_enrollment(request, course_id):
     enrollment.status = EnrollmentStatus.DROPPED
     enrollment.save(update_fields=["status"])
 
-    notify_enrollment_change(enrollment)
+    notify_enrollment_change(enrollment, "dropped")
 
     messages.success(request, f"You have dropped {course.title}.")
     return redirect("core:course_list")
@@ -132,7 +132,7 @@ def enrollment_list(request, course_id):
         "status_choices": EnrollmentStatus.choices,
         "current_filter": status_filter,
     }
-    return render(request, "core/courses/enrollment_list.html", context)
+    return render(request, "core/enrollment_list.html", context)
 
 
 @login_required
@@ -178,7 +178,7 @@ def update_enrollment_status(request, course_id, enrollment_id):
     enrollment.status = new_status
     enrollment.save(update_fields=["status"])
 
-    notify_enrollment_change(enrollment)
+    notify_enrollment_change(enrollment, enrollment.get_status_display())
 
     messages.success(
         request,

@@ -1,6 +1,6 @@
 # Infrastructure — routing, middleware, utilities, management commands
 
-Last verified: 2026-03-08
+Last verified: 2026-03-09
 Files covered: core/urls.py, core/views.py, core/forms.py, core/admin.py, core/middleware.py, core/context_processors.py, core/templatetags/core_tags.py, core/utils/, core/management/commands/
 
 ---
@@ -24,13 +24,15 @@ Updates `last_login` on each request, throttled to once per 5 minutes via sessio
 ### CourseContextMiddleware [L49]
 If URL resolves with `course_id` or `course_slug` kwarg, loads the Course object into `request.course`. Downstream views and context processors can use this without re-querying.
 
+Both middleware classes and the `learnhub_context` context processor are registered in `config/settings.py` (MIDDLEWARE and TEMPLATES context_processors lists respectively).
+
 ---
 
 ## Context Processors
 
 ### learnhub_context [L11]
 Injects: `user_role`, `is_instructor`, `is_student`, `unread_notification_count`, `current_course` (from middleware).
-Available in all templates.
+Available in all templates. Registered in `config/settings.py` TEMPLATES context_processors.
 
 ---
 
@@ -101,8 +103,8 @@ Batch sends using NOTIFICATION_BATCH_SIZE.
 ### notify_grade_posted(grade) [L132]
 Convenience wrapper — notifies the student that a grade was posted.
 
-### notify_enrollment_change(enrollment) [L155]
-Notifies student of status change. Notifies instructor of new enrollments.
+### notify_enrollment_change(enrollment, action) [L155]
+Notifies student of status change. Notifies instructor of new enrollments. The `action` parameter describes the enrollment action (e.g., "enrolled", "dropped", or the status display value).
 
 ### notify_new_discussion_post(post) [L190]
 Creates in-app Notification records synchronously via `send_bulk_notifications()`. A background `threading.Thread(daemon=True)` handles secondary processing (e.g., email dispatch via `_send_notifications_background()`). Notification DB records are fully created before the HTTP response returns — only the email processing is fire-and-forget.

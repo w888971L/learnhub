@@ -84,7 +84,7 @@ def submission_list(request, course_id, assignment_id):
     if status_filter and status_filter in SubmissionStatus.values:
         submissions = submissions.filter(status=status_filter)
 
-    return render(request, "core/assignments/submission_list.html", {
+    return render(request, "core/submission_list.html", {
         "course": course,
         "assignment": assignment,
         "submissions": submissions,
@@ -185,7 +185,7 @@ def grade_submission(request, course_id, assignment_id, submission_id):
     else:
         form = GradeForm()
 
-    return render(request, "core/assignments/grade_form.html", {
+    return render(request, "core/grade_form.html", {
         "course": course,
         "assignment": assignment,
         "submission": submission,

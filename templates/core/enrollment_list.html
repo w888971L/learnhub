@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Enrollments — {{ course.title }} — LearnHub{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Breadcrumb -->
+  <nav class="mb-6 text-sm text-gray-500">
+    <ol class="flex items-center space-x-2">
+      <li><a href="{% url 'core:course_detail' course.pk %}" class="hover:text-brand-600 transition-colors">{{ course.title }}</a></li>
+      <li><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg></li>
+      <li class="text-gray-900 font-medium">Enrollments</li>
+    </ol>
+  </nav>
+
+  <!-- Page header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Enrollments</h1>
+      <p class="mt-1 text-sm text-gray-500">Manage student enrollments for {{ course.title }}.</p>
+    </div>
+  </div>
+
+  <!-- Status filter -->
+  <form method="get" class="mb-6">
+    <div class="flex items-center space-x-3">
+      <label for="status" class="text-sm font-medium text-gray-700">Filter by status:</label>
+      <select name="status" id="status" onchange="this.form.submit()"
+        class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
+        <option value="">All</option>
+        {% for value, label in status_choices %}
+          <option value="{{ value }}" {% if current_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+
+  <!-- Enrollments table -->
+  {% if enrollments %}
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enrolled</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for enrollment in enrollments %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="h-8 w-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-semibold text-sm">
+                    {{ enrollment.student.first_name|default:enrollment.student.username|truncatechars:1|upper }}
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-900">{{ enrollment.student.get_full_name|default:enrollment.student.username }}</p>
+                    <p class="text-xs text-gray-500">{{ enrollment.student.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                  {% if enrollment.status == 'active' %}bg-green-100 text-green-800
+                  {% elif enrollment.status == 'pending' %}bg-yellow-100 text-yellow-800
+                  {% elif enrollment.status == 'completed' %}bg-blue-100 text-blue-800
+                  {% elif enrollment.status == 'dropped' %}bg-gray-100 text-gray-600
+                  {% else %}bg-gray-100 text-gray-600{% endif %}">
+                  {{ enrollment.get_status_display|default:enrollment.status|title }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ enrollment.final_grade_cache|default:"--" }}%
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ enrollment.enrolled_at|date:"M d, Y" }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="text-center py-16">
+      <h3 class="mt-4 text-lg font-medium text-gray-900">No enrollments found</h3>
+      <p class="mt-1 text-sm text-gray-500">
+        {% if current_filter %}No enrollments match the selected filter.{% else %}No students have enrolled in this course yet.{% endif %}
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

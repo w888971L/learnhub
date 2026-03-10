@@ -38,7 +38,7 @@ def course_create(request):
     else:
         form = CourseForm()
 
-    return render(request, "core/courses/course_form.html", {
+    return render(request, "core/course_form.html", {
         "form": form,
         "editing": False,
     })
@@ -68,7 +68,7 @@ def course_edit(request, course_id):
     else:
         form = CourseForm(instance=course)
 
-    return render(request, "core/courses/course_form.html", {
+    return render(request, "core/course_form.html", {
         "form": form,
         "course": course,
         "editing": True,
@@ -91,7 +91,7 @@ def module_list(request, course_id):
         .order_by("order")
     )
 
-    return render(request, "core/courses/module_list.html", {
+    return render(request, "core/module_list.html", {
         "course": course,
         "modules": modules,
     })
@@ -132,7 +132,7 @@ def module_create(request, course_id):
     else:
         form = ModuleForm()
 
-    return render(request, "core/courses/module_form.html", {
+    return render(request, "core/module_form.html", {
         "form": form,
         "course": course,
     })
@@ -149,7 +149,7 @@ def lesson_list(request, course_id, module_id):
 
     lessons = module.lessons.order_by("order")
 
-    return render(request, "core/courses/lesson_list.html", {
+    return render(request, "core/lesson_list.html", {
         "course": course,
         "module": module,
         "lessons": lessons,
@@ -189,7 +189,7 @@ def lesson_create(request, course_id, module_id):
     else:
         form = LessonForm()
 
-    return render(request, "core/courses/lesson_form.html", {
+    return render(request, "core/lesson_form.html", {
         "form": form,
         "course": course,
         "module": module,

@@ -1,6 +1,6 @@
 # Assignment Views — submission, grading, review
 
-Last verified: 2026-03-08
+Last verified: 2026-03-09
 Files covered: core/views_lib/assignments/submit.py, grade.py
 
 ---
@@ -10,7 +10,7 @@ Files covered: core/views_lib/assignments/submit.py, grade.py
 ### assignment_list [L47]
 GET: Lists assignments for a course. Students see their submission status per assignment. Instructors see submission counts.
 Decorators: @login_required, @course_participant_required
-Template: core/assignments/assignment_list.html
+Template: core/assignment_list.html
 
 ### assignment_create [L86]
 GET/POST: Instructor creates a new assignment for a course.
@@ -20,7 +20,7 @@ Form: AssignmentForm
 ### assignment_detail [L118]
 GET: Assignment detail. Students see their latest submission and final grade (if graded). Instructors see all submissions.
 Decorators: @login_required, @course_participant_required
-Template: core/assignments/assignment_detail.html
+Template: core/assignment_detail.html
 
 ### submit_assignment [L162]
 GET/POST: Student submits work for an assignment.
@@ -45,7 +45,7 @@ GET: Instructor views all submissions for an assignment. Shows latest version pe
 Uses: Subquery to filter to each student's latest-version submission (SQLite-compatible alternative to `distinct('student')`).
 Supports: `?status=` filter
 Decorators: @login_required, @instructor_required
-Template: core/assignments/submission_list.html
+Template: core/submission_list.html
 
 ### grade_submission [L98]
 GET/POST: Instructor grades a single submission.

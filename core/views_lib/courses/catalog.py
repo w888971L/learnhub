@@ -58,7 +58,7 @@ def course_list(request):
         "search_query": q,
         "org_filter": org_filter,
     }
-    return render(request, "core/courses/course_list.html", context)
+    return render(request, "core/course_list.html", context)
 
 
 @login_required
@@ -103,4 +103,4 @@ def course_detail(request, course_id):
         "enrollment": enrollment,
         "enrollment_count": enrollment_count,
     }
-    return render(request, "core/courses/course_detail.html", context)
+    return render(request, "core/course_detail.html", context)

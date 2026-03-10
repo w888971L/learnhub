@@ -24,7 +24,7 @@
         </div>
       {% endif %}
 
-      <form method="post" action="{% url 'login' %}" novalidate>
+      <form method="post" action="{% url 'core:login' %}" novalidate>
         {% csrf_token %}
         {% if next %}
           <input type="hidden" name="next" value="{{ next }}" />
@@ -68,7 +68,7 @@
 
     <p class="mt-6 text-center text-sm text-gray-500">
       Don't have an account?
-      <a href="{% url 'register' %}" class="text-brand-600 hover:text-brand-800 font-medium transition-colors">Sign up</a>
+      <a href="{% url 'core:register' %}" class="text-brand-600 hover:text-brand-800 font-medium transition-colors">Sign up</a>
     </p>
   </div>
 </div>

@@ -24,7 +24,7 @@
         </div>
       {% endif %}
 
-      <form method="post" action="{% url 'register' %}" novalidate>
+      <form method="post" action="{% url 'core:register' %}" novalidate>
         {% csrf_token %}
 
         <!-- Username -->
@@ -97,7 +97,7 @@
 
     <p class="mt-6 text-center text-sm text-gray-500">
       Already have an account?
-      <a href="{% url 'login' %}" class="text-brand-600 hover:text-brand-800 font-medium transition-colors">Log in</a>
+      <a href="{% url 'core:login' %}" class="text-brand-600 hover:text-brand-800 font-medium transition-colors">Log in</a>
     </p>
   </div>
 </div>

@@ -1,0 +1,112 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Grade Submission — {{ assignment.title }} — LearnHub{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Breadcrumb -->
+  <nav class="mb-6 text-sm text-gray-500">
+    <ol class="flex items-center space-x-2">
+      <li><a href="{% url 'core:course_detail' course.pk %}" class="hover:text-brand-600 transition-colors">{{ course.title }}</a></li>
+      <li><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg></li>
+      <li><a href="{% url 'core:assignment_detail' course.pk assignment.pk %}" class="hover:text-brand-600 transition-colors">{{ assignment.title }}</a></li>
+      <li><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg></li>
+      <li><a href="{% url 'core:submission_list' course.pk assignment.pk %}" class="hover:text-brand-600 transition-colors">Submissions</a></li>
+      <li><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg></li>
+      <li class="text-gray-900 font-medium">Grade</li>
+    </ol>
+  </nav>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Submission content -->
+    <div class="lg:col-span-2">
+      <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">Submission</h2>
+          <div class="text-sm text-gray-500">
+            <span class="font-medium text-gray-900">{{ submission.student.get_full_name|default:submission.student.username }}</span>
+            &middot; {{ submission.submitted_at|date:"M d, Y g:i A" }}
+            {% if submission.is_late %}
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 ml-1">Late</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4">
+          {{ submission.content|linebreaksbr }}
+        </div>
+      </div>
+
+      <!-- Grading form -->
+      <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Grade Submission</h2>
+
+        <form method="post">
+          {% csrf_token %}
+
+          {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+              <ul class="text-sm text-red-700 space-y-1">
+                {% for field, errors in form.errors.items %}
+                  {% for error in errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          {% for field in form %}
+            <div class="mb-4">
+              <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">{{ field.label }}</label>
+              {% if field.name == 'feedback' %}
+                <textarea id="{{ field.id_for_label }}" name="{{ field.html_name }}" rows="4"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-shadow resize-y">{{ field.value|default:'' }}</textarea>
+              {% else %}
+                <input type="{{ field.field.widget.input_type|default:'text' }}" id="{{ field.id_for_label }}" name="{{ field.html_name }}" value="{{ field.value|default:'' }}"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-shadow"
+                  {% if field.field.required %}required{% endif %} />
+              {% endif %}
+              {% if field.help_text %}
+                <p class="mt-1 text-xs text-gray-500">{{ field.help_text }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <p class="text-xs text-gray-500 mb-4">Max score: {{ assignment.max_score }} points</p>
+
+          <div class="flex items-center justify-end space-x-3">
+            <a href="{% url 'core:submission_list' course.pk assignment.pk %}" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors">Cancel</a>
+            <button type="submit" class="px-6 py-2.5 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm">
+              Submit Grade
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sidebar: existing grades -->
+    <div class="lg:col-span-1">
+      {% if existing_grades %}
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+          <h3 class="text-sm font-semibold text-gray-900 mb-4">Previous Grades</h3>
+          <ul class="space-y-3">
+            {% for grade in existing_grades %}
+              <li class="border border-gray-100 rounded-lg p-3">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-sm font-semibold text-gray-900">{{ grade.score }}/{{ assignment.max_score }}</span>
+                  <span class="text-xs text-gray-500">{{ grade.graded_at|date:"M d, Y" }}</span>
+                </div>
+                <p class="text-xs text-gray-500">Graded by {{ grade.grader.get_full_name|default:grade.grader.username }}</p>
+                {% if grade.feedback %}
+                  <p class="text-xs text-gray-600 mt-1 line-clamp-2">{{ grade.feedback|truncatewords:20 }}</p>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

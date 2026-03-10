@@ -26,15 +26,15 @@
 
   <!-- Quick actions -->
   <div class="flex flex-wrap gap-3 mb-8">
-    <a href="{% url 'course_list' %}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
+    <a href="{% url 'core:course_list' %}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
       <svg class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
       Browse Courses
     </a>
-    <a href="{% url 'grades_overview' %}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
+    <a href="{% url 'core:student_dashboard' %}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
       <svg class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
       View Grades
     </a>
-    <a href="{% url 'notifications' %}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
+    <a href="{% url 'core:api_notifications' %}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
       <svg class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
       Notifications
       {% if unread_notification_count %}
@@ -51,12 +51,12 @@
       <div>
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-gray-900">My Courses</h2>
-          <a href="{% url 'course_list' %}" class="text-sm text-brand-600 hover:text-brand-800 font-medium transition-colors">View all</a>
+          <a href="{% url 'core:course_list' %}" class="text-sm text-brand-600 hover:text-brand-800 font-medium transition-colors">View all</a>
         </div>
         {% if enrolled_courses %}
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {% for enrollment in enrolled_courses %}
-              <a href="{% url 'course_detail' enrollment.course.pk %}" class="block bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+              <a href="{% url 'core:course_detail' enrollment.course.pk %}" class="block bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
                 <h3 class="text-sm font-semibold text-gray-900 mb-3 truncate">{{ enrollment.course.title }}</h3>
 
                 <!-- Progress bar -->
@@ -91,7 +91,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
             </svg>
             <p class="mt-3 text-sm text-gray-500">You are not enrolled in any courses yet.</p>
-            <a href="{% url 'course_list' %}" class="mt-3 inline-flex items-center text-sm text-brand-600 hover:text-brand-800 font-medium">Browse courses &rarr;</a>
+            <a href="{% url 'core:course_list' %}" class="mt-3 inline-flex items-center text-sm text-brand-600 hover:text-brand-800 font-medium">Browse courses &rarr;</a>
           </div>
         {% endif %}
       </div>
@@ -104,7 +104,7 @@
             <ul class="divide-y divide-gray-100">
               {% for assignment in upcoming_assignments %}
                 <li>
-                  <a href="{% url 'assignment_detail' assignment.course.pk assignment.pk %}" class="flex items-center px-5 py-4 hover:bg-gray-50 transition-colors">
+                  <a href="{% url 'core:assignment_detail' assignment.course.pk assignment.pk %}" class="flex items-center px-5 py-4 hover:bg-gray-50 transition-colors">
                     <div class="flex-1 min-w-0">
                       <p class="text-sm font-medium text-gray-900 truncate">{{ assignment.title }}</p>
                       <p class="text-xs text-gray-500 mt-0.5">{{ assignment.course.title }}</p>
@@ -139,7 +139,7 @@
       <div>
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-gray-900">Recent Notifications</h2>
-          <a href="{% url 'notifications' %}" class="text-sm text-brand-600 hover:text-brand-800 font-medium transition-colors">View all</a>
+          <a href="{% url 'core:api_notifications' %}" class="text-sm text-brand-600 hover:text-brand-800 font-medium transition-colors">View all</a>
         </div>
         <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
           {% if recent_notifications %}

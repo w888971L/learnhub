@@ -1,6 +1,6 @@
 # Course Views — catalog, enrollment, course management
 
-Last verified: 2026-03-08
+Last verified: 2026-03-09
 Files covered: core/views_lib/courses/catalog.py, enrollment.py, management.py
 
 ---
@@ -11,13 +11,13 @@ Files covered: core/views_lib/courses/catalog.py, enrollment.py, management.py
 GET: Lists courses. Students see published courses only. Instructors see their own courses (all statuses).
 Supports: `?q=` title filter, `?org=` organization filter. Paginated by 12.
 Decorators: @login_required
-Template: core/courses/course_list.html
+Template: core/course_list.html
 → see models_courses.md Course `status` for visibility rules
 
 ### course_detail [L66]
 GET: Course detail with modules, lessons, assignments. Checks enrollment status for student context.
 Decorators: @login_required, @course_participant_required
-Template: core/courses/course_detail.html
+Template: core/course_detail.html
 Context: course, modules (prefetch lessons), assignments, enrollment (if student), enrollment_count (if instructor/admin)
 
 ---
@@ -27,26 +27,26 @@ Context: course, modules (prefetch lessons), assignments, enrollment (if student
 ### enroll [L41]
 POST only. Creates Enrollment(status='active') for the requesting student.
 Guards: course must be published, not full, student not already enrolled.
-Side effects: calls `notify_enrollment_change(enrollment)`
+Side effects: calls `notify_enrollment_change(enrollment, "enrolled")`
 Redirects to course_detail.
 Decorators: @login_required, @student_required
 
 ### drop_enrollment [L82]
 POST only. Sets enrollment status to 'dropped'.
 Guards: enrollment must exist and be in 'active' or 'pending' status.
-Side effects: calls `notify_enrollment_change(enrollment)`
+Side effects: calls `notify_enrollment_change(enrollment, "dropped")`
 Decorators: @login_required, @student_required
 
 ### enrollment_list [L111]
 GET: Instructor view of all enrollments for a course. Shows student name, status, enrolled date, final_grade_cache.
 Supports: `?status=` filter (active/completed/dropped/pending)
 Decorators: @login_required, @instructor_required
-Template: core/courses/enrollment_list.html
+Template: core/enrollment_list.html
 
 ### update_enrollment_status [L141]
 POST: Instructor updates enrollment status. Validates state machine transitions.
 ! TRIPWIRE — State Machine: Invalid transitions return 400. See models_courses.md for valid transitions.
-Side effects: calls `notify_enrollment_change(enrollment)`.
+Side effects: calls `notify_enrollment_change(enrollment, enrollment.get_status_display())`.
 Decorators: @login_required, @instructor_required
 
 ---
@@ -57,7 +57,7 @@ Decorators: @login_required, @instructor_required
 GET/POST: Instructor creates a new course. Auto-sets instructor=request.user, organization=user.organization.
 Decorators: @login_required, @instructor_required
 Form: CourseForm
-Template: core/courses/course_form.html
+Template: core/course_form.html
 
 ### course_edit [L49]
 GET/POST: Edit existing course. Only the course's instructor or admin.

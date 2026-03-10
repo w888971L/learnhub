@@ -75,7 +75,7 @@ def assignment_list(request, course_id):
             ),
         )
 
-    return render(request, "core/assignments/assignment_list.html", {
+    return render(request, "core/assignment_list.html", {
         "course": course,
         "assignments": assignments,
     })
@@ -107,7 +107,7 @@ def assignment_create(request, course_id):
     else:
         form = AssignmentForm()
 
-    return render(request, "core/assignments/assignment_form.html", {
+    return render(request, "core/assignment_form.html", {
         "course": course,
         "form": form,
     })
@@ -148,7 +148,7 @@ def assignment_detail(request, course_id, assignment_id):
             .order_by("student__username", "-version")
         )
 
-    return render(request, "core/assignments/assignment_detail.html", {
+    return render(request, "core/assignment_detail.html", {
         "course": course,
         "assignment": assignment,
         "student_submission": student_submission,
@@ -235,7 +235,7 @@ def submit_assignment(request, course_id, assignment_id):
     else:
         form = SubmissionForm()
 
-    return render(request, "core/assignments/submit.html", {
+    return render(request, "core/assignment_submit.html", {
         "course": course,
         "assignment": assignment,
         "form": form,
