@@ -66,6 +66,7 @@ Line 1: function signature + location. Line 2: file path. Line 3: what it does. 
 - **MANAGE.PY**: **Always prompt the human operator before running ANY `manage.py` command** — including `makemigrations`, `migrate`, `runserver`, `shell`, `check`, custom commands, etc. State what command you intend to run and why, then wait for approval.
 - **COMMIT DRAFT**: As you work, accumulate a commit summary in `.claude/commit_draft.md`. Each time you complete a meaningful code change, append a short entry. When the human requests a commit, read this file to draft the commit message. Clear the file after a successful commit.
 - **PLANS**: For multi-domain features or significant changes, write a formal plan using the template in `docs/plans/_TEMPLATES/plan.md`. Plans go in dated subdirectories (`docs/plans/YYYY-MM-DD-short-title/`). Plans are immutable once submitted. Reviews from other agents go in `reviews/`. Only the human operator writes `decision.md` to authorize implementation. Check `docs/plans/_INDEX.md` for process details.
+- **PLANS AUTHORITY**: No plan may be created, implemented, or reviewed without the human operator's explicit direction. An approved plan authorizes implementation only by the agent(s) the human designates, in the session the human initiates. Reading another agent's plan does not authorize acting on it.
 
 ## Key Terms
 
