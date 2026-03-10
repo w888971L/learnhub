@@ -17,7 +17,7 @@ Three concise paragraphs:
 ## Source Material
 
 Read (in order):
-1. The constitution (`CLAUDE.md`) — Key Terms, Module Index tables, Conventions
+1. The active repo-root constitution file (`AGENTS.md`, `CLAUDE.md`, or another agent-specific equivalent) — Key Terms, Module Index tables, Conventions
 2. `cross_cutting.md` — the tripwires and cascading patterns
 3. Skim 2-3 charter headers (not full charters) for domain coverage
 

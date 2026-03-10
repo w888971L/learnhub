@@ -6,7 +6,7 @@ This file is the **Constitution** — the supreme reference for AI-assisted deve
 
 | Governance term | What it is | Location | Audience |
 |----------------|-----------|----------|----------|
-| **Constitution** | This file. Master index, conventions, key terms. | `GEMINI.md` | AI assistant (LLM) |
+| **Constitution** | This file. Master index, conventions, key terms. | `AGENTS.md` | AI assistant (LLM) |
 | **Charters** | Per-domain API reference. One charter per domain — defines the granted authority (public functions, models, contracts) for that domain. | `docs/architecture/modules/*.md` | AI assistant (LLM) |
 | **Procedures** | Executable practices with prompt templates and agent configurations. Invoked via `/command` skills. Bridge to Claude Code's native skill system. | `docs/procedures/*.md` | AI assistant (LLM) |
 | **Reference Notes** | Situational cognitive aids. Consulted at specific moments (after planning, before risky changes). Not executable — they inform judgment. | `docs/reference-notes/*.md` | AI assistant (LLM) |
@@ -17,7 +17,7 @@ This file is the **Constitution** — the supreme reference for AI-assisted deve
 
 **Enforcer independence principle**: Enforcers exist to catch what the primary agent misses. A model reviewing its own output has the same biases and blind spots that produced the errors — even across separate sessions. Enforcers MUST be run by a **different model entirely** (e.g., Claude Sonnet verifying Claude Opus's work, or Gemini verifying Claude's work). A different session of the same model does not count. This is not optional — same-model review is not enforcement. The most common implementation is a lightweight API call to Claude Sonnet — inexpensive and fast, but requires an `ANTHROPIC_API_KEY` in environment variables.
 
-**Agent-specific constitution rule**: This repository may contain multiple root constitution files for different agents (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`). In this file, references to "the constitution" mean the active agent's own root constitution file — for Gemini sessions, `GEMINI.md`.
+**Agent-specific constitution rule**: This repository may contain multiple root constitution files for different agents (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`). In this file, references to "the constitution" mean the active agent's own root constitution file — for Codex sessions, `AGENTS.md`.
 
 **Living docs update chain**: Code change → Charter update → Public Record update (all in the same session). Enforcers verify this chain was followed correctly, after the fact.
 
@@ -34,14 +34,7 @@ Charters use a compact notation optimized for LLM parsing. Learn these symbols b
 | `---` | Section boundary — new topic or domain within a charter | |
 | `TRIPWIRE` | Explicit label for the most dangerous non-obvious patterns | `## Grade Cache Duality (TRIPWIRE)` |
 
-### Charter Traversal Rule
-When a charter contains a cross-reference (`→`), follow the trail selectively:
-1. **Identify the target**: Use the filename and symbol name provided (e.g., `cross_cutting.md "Grade Cascade"`).
-2. **Targeted Read**: Use `grep_search` to find the specific section or `read_file` with `start_line` if a line number `[Lnnn]` is provided.
-3. **Context Only**: Do not read the entire target charter unless the task context requires the full domain overview.
-
 **Reading a charter entry:**
-
 ```
 ### apply_grade(submission, raw_score, grader) [L45]
 File: core/utils/grading.py
@@ -122,14 +115,6 @@ When a task spans multiple domains, read these charters together:
 | Permission changes | `infrastructure.md` (permissions) + all view charters |
 | Notification changes | `infrastructure.md` (notifications) + view charters that trigger them |
 | Refactoring / code health | `cross_cutting.md` + relevant per-module docs |
-
-## Approval Protocol (MANDATORY)
-
-Before modifying any files (except for creating a plan document), you MUST follow this sequence:
-
-1. **Research & Plan**: Analyze the codebase and draft a plan (e.g., in `docs/`).
-2. **Consult Risk Awareness**: Read `docs/reference-notes/risk-awareness.md` and append a "Risk Assessment" section to your plan.
-3. **Obtain Approval**: Present the final plan to the human operator and wait for an explicit Directive (e.g., "Proceed with the plan") before executing any code changes.
 
 ## Procedures & Reference Notes — Dispatch Table
 

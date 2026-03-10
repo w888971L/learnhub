@@ -17,6 +17,8 @@ This file is the **Constitution** — the supreme reference for AI-assisted deve
 
 **Enforcer independence principle**: Enforcers exist to catch what the primary agent misses. A model reviewing its own output has the same biases and blind spots that produced the errors — even across separate sessions. Enforcers MUST be run by a **different model entirely** (e.g., Claude Sonnet verifying Claude Opus's work, or Gemini verifying Claude's work). A different session of the same model does not count. This is not optional — same-model review is not enforcement. The most common implementation is a lightweight API call to Claude Sonnet — inexpensive and fast, but requires an `ANTHROPIC_API_KEY` in environment variables.
 
+**Agent-specific constitution rule**: This repository may contain multiple root constitution files for different agents (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`). In this file, references to "the constitution" mean the active agent's own root constitution file — for Claude Code sessions, `CLAUDE.md`.
+
 **Living docs update chain**: Code change → Charter update → Public Record update (all in the same session). Enforcers verify this chain was followed correctly, after the fact.
 
 ## Charter Notation

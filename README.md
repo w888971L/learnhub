@@ -30,7 +30,7 @@ Constitutional architecture is, in a practical sense, **a Memex for AI-assisted 
 
 | Layer | Bush's Memex Analog | Purpose |
 |-------|-------------------|---------|
-| **Constitution** (`CLAUDE.md`) | The desk — starting point with an index of all trails | Routes the agent to relevant knowledge based on the task at hand |
+| **Constitution** (`AGENTS.md`, `CLAUDE.md`, or another agent-specific root file) | The desk — starting point with an index of all trails | Routes the agent to relevant knowledge based on the task at hand |
 | **Charters** (`docs/architecture/modules/`) | Core reference documents with margin annotations | Per-domain API reference with tripwire warnings and cross-references |
 | **Cross-cutting concerns** (`cross_cutting.md`) | Associative trails linking documents across topics | Documents invisible dependencies between domains |
 | **Procedures** (`docs/procedures/`) | Repeatable research protocols | Executable practices with prompt templates |
@@ -68,16 +68,16 @@ Creates Grade record with penalty-adjusted score.
 
 The first time you point an AI assistant at this project:
 
-> Read CLAUDE.md first — it's the constitution for this project. It will tell you where everything is, what the key terms mean, and which charters to read for each domain. Before making any code changes, check cross_cutting.md for tripwires — non-obvious patterns that will break if you assume the obvious.
+> Read the active repo-root constitution file first (`AGENTS.md` for Codex, `CLAUDE.md` for Claude Code). It will tell you where everything is, what the key terms mean, and which charters to read for each domain. Before making any code changes, check cross_cutting.md for tripwires — non-obvious patterns that will break if you assume the obvious.
 
 **Reading order for the AI:**
-1. `CLAUDE.md` — the constitution (master index, conventions, cross-references)
+1. The active repo-root constitution file (`AGENTS.md`, `CLAUDE.md`, etc.) — the constitution (master index, conventions, cross-references)
 2. `docs/architecture/modules/cross_cutting.md` — tripwires and cache dualities (read before touching anything)
 3. The relevant domain charter(s) for whatever you're working on
 4. The relevant flow doc(s) in `docs/flows/` for business context
 
 **To adopt this architecture for your own project**, say:
-> Read the constitutional architecture in this repository (CLAUDE.md, docs/architecture/modules/, docs/flows/) and build the same governance structure for my codebase. Start with a constitution, then write charters for each domain, then write flow docs for the key user journeys.
+> Read the constitutional architecture in this repository (the repo-root constitution file, docs/architecture/modules/, docs/flows/) and build the same governance structure for my codebase. Start with a constitution, then write charters for each domain, then write flow docs for the key user journeys.
 
 ---
 
@@ -90,7 +90,7 @@ This repository includes a control study comparing AI agent performance with and
 
 The feature was chosen because it crosses multiple domains (grading, enrollment, caching, analytics) and contains non-obvious tripwires (penalty-adjusted scores, cache invalidation chains, late penalty timing) that are documented in the constitution but invisible in the code alone.
 
-Results are in `docs/control-study/`.
+Results are in `docs/experiments/experiment-1/`.
 
 ---
 
@@ -114,7 +114,9 @@ All four are documented in detail in `docs/architecture/modules/cross_cutting.md
 
 ```
 learnhub/
-├── CLAUDE.md                              # Constitution
+├── AGENTS.md                              # Codex constitution
+├── CLAUDE.md                              # Claude Code constitution
+├── GEMINI.md                              # Gemini constitution
 ├── config/                                # Django settings, URLs, WSGI
 ├── core/
 │   ├── models.py                          # All 16 models (~950 lines)
@@ -189,7 +191,7 @@ The `seed_data` command creates sample users with password **`testpass123`** for
 
 - Vannevar Bush, [*"As We May Think"*](https://www.theatlantic.com/magazine/archive/1945/07/as-we-may-think/303881/), The Atlantic, July 1945
 - Doug Engelbart, *"Augmenting Human Intellect: A Conceptual Framework"*, SRI, 1962 — extended Bush's vision to interactive computing
-- The constitution itself: start with `CLAUDE.md` and follow the trails
+- The constitution itself: start with the active repo-root constitution file and follow the trails
 
 ## License
 

@@ -8,7 +8,7 @@
 
 A constitutional architecture needs three things to start:
 
-1. **Constitution** (`CLAUDE.md` at repo root) — conventions, key terms, module index
+1. **Constitution** (an agent-specific file such as `AGENTS.md` or `CLAUDE.md` at repo root) — conventions, key terms, module index
 2. **One cross-cutting charter** (`cross_cutting.md`) — the dangerous patterns that span modules
 3. **One domain charter** — pick the highest-traffic or most complex domain first
 

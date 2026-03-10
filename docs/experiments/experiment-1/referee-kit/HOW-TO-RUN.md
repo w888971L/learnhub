@@ -46,7 +46,7 @@ export OPENAI_API_KEY=your-key-here
 
 # Run from the learnhub project root
 # Codex can read files from the repo directly
-codex "$(cat docs/control-study/referee-kit/referee-prompt.md)
+codex "$(cat docs/experiments/experiment-1/referee-kit/referee-prompt.md)
 
 Please read these files:
 - core/utils/grading.py
@@ -55,10 +55,10 @@ Please read these files:
 - core/views_lib/assignments/grade.py
 - core/views_lib/courses/management.py
 - core/forms.py
-- docs/control-study/referee-kit/rubric.md
-- docs/control-study/referee-kit/plan-a.md
-- docs/control-study/referee-kit/plan-b.md
-- docs/control-study/referee-kit/plan-c.md
+- docs/experiments/experiment-1/referee-kit/rubric.md
+- docs/experiments/experiment-1/referee-kit/plan-a.md
+- docs/experiments/experiment-1/referee-kit/plan-b.md
+- docs/experiments/experiment-1/referee-kit/plan-c.md
 
 Score all three plans against the rubric."
 ```
@@ -74,11 +74,11 @@ pip install llm-openai  # if needed
 llm keys set openai
 
 # Concatenate all files and pipe to the model
-cat docs/control-study/referee-kit/referee-prompt.md \
-    docs/control-study/referee-kit/rubric.md \
-    docs/control-study/referee-kit/plan-a.md \
-    docs/control-study/referee-kit/plan-b.md \
-    docs/control-study/referee-kit/plan-c.md \
+cat docs/experiments/experiment-1/referee-kit/referee-prompt.md \
+    docs/experiments/experiment-1/referee-kit/rubric.md \
+    docs/experiments/experiment-1/referee-kit/plan-a.md \
+    docs/experiments/experiment-1/referee-kit/plan-b.md \
+    docs/experiments/experiment-1/referee-kit/plan-c.md \
     core/utils/grading.py \
     core/utils/cache_manager.py \
     core/models.py \
@@ -92,7 +92,7 @@ cat docs/control-study/referee-kit/referee-prompt.md \
 
 ```bash
 # For more control, use a Python script
-python docs/control-study/referee-kit/run_referee.py
+python docs/experiments/experiment-1/referee-kit/run_referee.py
 ```
 
 (Create `run_referee.py` if you want full control over the API call, temperature=0, etc.)
