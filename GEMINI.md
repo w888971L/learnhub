@@ -10,6 +10,7 @@ This file is the **Constitution** — the supreme reference for AI-assisted deve
 | **Charters** | Per-domain API reference. One charter per domain — defines the granted authority (public functions, models, contracts) for that domain. | `docs/architecture/modules/*.md` | AI assistant (LLM) |
 | **Procedures** | Executable practices with prompt templates and agent configurations. Invoked via `/command` skills. Bridge to Claude Code's native skill system. | `docs/procedures/*.md` | AI assistant (LLM) |
 | **Reference Notes** | Situational cognitive aids. Consulted at specific moments (after planning, before risky changes). Not executable — they inform judgment. | `docs/reference-notes/*.md` | AI assistant (LLM) |
+| **Plans** | Pre-implementation deliberation. Proposed plans, structured reviews from other agents, and human decisions. Immutable once submitted. | `docs/plans/` | AI team + human operator |
 | **Public Record** | Human-readable business flow docs. Step-by-step walkthroughs of how features work end-to-end. | `docs/flows/*.md` | Staff, humans, onboarding |
 | **Enforcers** | Automated consistency checks that verify propagation between governance layers. Run by a **different model** — never the same model that made the changes. | `docs/procedures/enforce.md` | Independent AI model |
 
@@ -64,6 +65,7 @@ Line 1: function signature + location. Line 2: file path. Line 3: what it does. 
 - **LIVING DOCS**: After any code change to public functions/classes/models, update the relevant **charter** in `docs/architecture/modules/`. For changes that affect business flows, also update the relevant **public record** in `docs/flows/`.
 - **MANAGE.PY**: **Always prompt the human operator before running ANY `manage.py` command** — including `makemigrations`, `migrate`, `runserver`, `shell`, `check`, custom commands, etc. State what command you intend to run and why, then wait for approval.
 - **COMMIT DRAFT**: As you work, accumulate a commit summary in `.claude/commit_draft.md`. Each time you complete a meaningful code change, append a short entry. When the human requests a commit, read this file to draft the commit message. Clear the file after a successful commit.
+- **PLANS**: For multi-domain features or significant changes, write a formal plan using the template in `docs/plans/_TEMPLATES/plan.md`. Plans go in dated subdirectories (`docs/plans/YYYY-MM-DD-short-title/`). Plans are immutable once submitted. Reviews from other agents go in `reviews/`. Only the human operator writes `decision.md` to authorize implementation. Check `docs/plans/_INDEX.md` for process details.
 
 ## Key Terms
 
@@ -141,6 +143,8 @@ Procedures and reference notes are **not** loaded by default. Consult them when 
 | Producing a synthesized explanation of a domain or flow | Procedure | Briefing | `docs/procedures/briefing.md` |
 | Architectural drift discovery (weekly, one file at a time) | Procedure | Informed Perusal | `docs/procedures/perusal.md` |
 | Periodic charter accuracy audit | Procedure | Full Charter Review | `docs/procedures/full-review.md` |
+| Planning a multi-domain feature or significant change | Deliberation | Plans | `docs/plans/_INDEX.md` |
+| Reviewing another agent's plan | Deliberation | Plan Review | `docs/plans/_TEMPLATES/review.md` |
 | After completing a plan, before presenting to human | Reference Note | Risk Awareness | `docs/reference-notes/risk-awareness.md` |
 | Bootstrapping constitutional architecture on a new codebase | Reference Note | Starter Kit | `docs/reference-notes/starter-kit.md` |
 
