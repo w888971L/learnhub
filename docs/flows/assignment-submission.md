@@ -70,4 +70,3 @@ Previous versions remain accessible for reference on the assignment detail page.
 
 ---
 
-*Charter sources: views_assignments.md, models_assignments.md, infrastructure.md*

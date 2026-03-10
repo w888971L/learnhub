@@ -1,8 +1,8 @@
 """
 Grading views — viewing submissions and grading them.
 
-CRITICAL GRADING FLOW (TRIPWIRE PATH)
-======================================
+CRITICAL GRADING FLOW
+=====================
 Late penalty is applied at grade time, NOT at submission time.
 
 1. Validate GradeForm.
@@ -100,7 +100,7 @@ def grade_submission(request, course_id, assignment_id, submission_id):
     GET:  Display grading form for a submission.
     POST: Grade the submission.
 
-    TRIPWIRE: Late penalty is applied HERE via ``apply_grade()``,
+    WARNING: Late penalty is applied HERE via ``apply_grade()``,
     not at submission time.
 
     POST flow:

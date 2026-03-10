@@ -396,9 +396,8 @@ class Enrollment(models.Model):
 
     ``final_grade_cache`` is a **CACHED aggregate**. The source of truth
     is the collection of :class:`Grade` records attached to the student's
-    submissions for this course. See ``cross_cutting.md`` —
-    *Grade Cache Duality* — for the authoritative explanation of when
-    and how the cache is refreshed.
+    submissions for this course. The cache must be explicitly recalculated
+    after any grade change via ``recalculate_grade_cache()``.
     """
 
     student = models.ForeignKey(

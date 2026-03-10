@@ -1,112 +1,6 @@
 # LearnHub
 
-A Django learning management system — and a reference implementation for **constitutional architecture**, a governance pattern for AI-assisted software development.
-
-The application is real and functional (courses, enrollments, assignments, grading, discussions). The architecture documentation is the showcase.
-
----
-
-## From Memex to Constitutional Architecture
-
-In 1945, Vannevar Bush published *"As We May Think"* in The Atlantic. He described the **Memex** — a hypothetical device where a researcher could store documents and, critically, create **associative trails** between them. Bush's insight wasn't about storage. Filing cabinets already stored things. His insight was that knowledge becomes powerful through *links* — when navigating one document naturally surfaces related documents, warnings, and context that the researcher would not have thought to look for.
-
-> "The human mind operates by association. With one item in its grasp, it snaps instantly to the next that is suggested by the association of thoughts."
-> — Vannevar Bush, *As We May Think* (1945)
-
-The web partially realized this vision for humans. Hyperlinks let people follow associative trails through knowledge. But we now have a new class of knowledge worker — the AI coding agent — and it faces the same problem Bush identified 80 years ago.
-
-When an AI agent encounters a task, it reads code. Code tells you *what* exists. It does not tell you:
-
-- **What will break** if you change this function (non-obvious dependencies across modules)
-- **What's deceptive** about this value (a score field that stores penalty-adjusted values, not raw scores)
-- **What else must change** when you change this (a cache that must be invalidated, a downstream document that must be updated)
-- **What to read first** before attempting a category of change
-
-These are exactly the kinds of associative connections Bush wanted the Memex to provide. Without them, AI agents make changes that look correct in isolation but break things they didn't know were connected.
-
-Constitutional architecture is, in a practical sense, **a Memex for AI-assisted development**.
-
-### The Layers
-
-| Layer | Bush's Memex Analog | Purpose |
-|-------|-------------------|---------|
-| **Constitution** (`AGENTS.md`, `CLAUDE.md`, or another agent-specific root file) | The desk — starting point with an index of all trails | Routes the agent to relevant knowledge based on the task at hand |
-| **Charters** (`docs/architecture/modules/`) | Core reference documents with margin annotations | Per-domain API reference with tripwire warnings and cross-references |
-| **Cross-cutting concerns** (`cross_cutting.md`) | Associative trails linking documents across topics | Documents invisible dependencies between domains |
-| **Procedures** (`docs/procedures/`) | Repeatable research protocols | Executable practices with prompt templates |
-| **Reference notes** (`docs/reference-notes/`) | Researcher's judgment notes | Cognitive aids consulted at decision points |
-| **Public record** (`docs/flows/`) | Published summaries for colleagues | Human-readable walkthroughs of how features work |
-| **Enforcers** | Peer review by a different researcher | Independent verification that knowledge stays consistent |
-
-### Associative Trails in Practice
-
-Bush's trails were links between documents that a researcher created as they worked. In constitutional architecture, these trails are formalized:
-
-**Cross-references** (`→`) connect related concepts across charters:
-```
-### apply_grade(submission, raw_score, grader)
-Creates Grade record with penalty-adjusted score.
-! The instructor sees raw_score in the form, but Grade.score is penalty-adjusted.
-→ see cross_cutting.md "Late Penalty Timing"
-```
-
-**Tripwire warnings** (`!`) are Bush's margin annotations — notes that say "this is not what you think it is." They interrupt the agent's assumptions before those assumptions become bugs.
-
-**The dispatch table** in the constitution maps task patterns to document sets — "if you're working on grading, read these three charters together." This is the Memex's associative index: given what you're doing, here's the trail to follow.
-
-**The propagation map** tracks how changes ripple through the knowledge layer — when a charter changes, which downstream documents need updating. Bush envisioned trails as static once created. The propagation map makes them *maintainable*.
-
-### What This Is Not
-
-- **Not prompt engineering.** Prompts tell an AI what to *do*. The constitution tells it what to *know*. Knowledge shapes judgment across every task, not just the one a prompt was written for.
-- **Not documentation.** Documentation is written for humans to read linearly. Charters are written for AI agents to consult associatively — compact notation, line anchors, tripwire markers, cross-references. The format is optimized for a different kind of reader.
-- **Not "just skills files."** Skills execute procedures. The constitutional architecture provides the knowledge that makes those procedures (and all other work) correct. A skill says "run this." A charter says "here's what you'll get wrong if you don't understand this first."
-
----
-
-## Prompt Zero — Onboarding an AI Assistant
-
-The first time you point an AI assistant at this project:
-
-> Read the active repo-root constitution file first (`AGENTS.md` for Codex, `CLAUDE.md` for Claude Code). It will tell you where everything is, what the key terms mean, and which charters to read for each domain. Before making any code changes, check cross_cutting.md for tripwires — non-obvious patterns that will break if you assume the obvious.
-
-**Reading order for the AI:**
-1. The active repo-root constitution file (`AGENTS.md`, `CLAUDE.md`, etc.) — the constitution (master index, conventions, cross-references)
-2. `docs/architecture/modules/cross_cutting.md` — tripwires and cache dualities (read before touching anything)
-3. The relevant domain charter(s) for whatever you're working on
-4. The relevant flow doc(s) in `docs/flows/` for business context
-
-**To adopt this architecture for your own project**, say:
-> Read the constitutional architecture in this repository (the repo-root constitution file, docs/architecture/modules/, docs/flows/) and build the same governance structure for my codebase. Start with a constitution, then write charters for each domain, then write flow docs for the key user journeys.
-
----
-
-## The Control Study
-
-This repository includes a control study comparing AI agent performance with and without constitutional architecture. The same feature — **grade forgiveness** (dropping a student's lowest assignment grade) — is planned by two agents:
-
-1. **Control**: Claude Code with the raw codebase, no constitutional architecture
-2. **Constitutional**: Claude Code with the full constitution, charters, and cross-cutting concerns
-
-The feature was chosen because it crosses multiple domains (grading, enrollment, caching, analytics) and contains non-obvious tripwires (penalty-adjusted scores, cache invalidation chains, late penalty timing) that are documented in the constitution but invisible in the code alone.
-
-Results are in `docs/experiments/experiment-1/`.
-
----
-
-## The Tripwires
-
-These are the non-obvious patterns that will break if you assume the obvious:
-
-1. **Grade Cache Duality** — `Enrollment.final_grade_cache` is NOT the source of truth. Grade records are. The cache must be explicitly recalculated after any grade change.
-
-2. **Late Penalty Timing** — Penalties are applied at GRADING time, not submission time. A late submission is accepted normally; the penalty appears only when the instructor grades it.
-
-3. **Grade Cascade** — Finalizing a grade triggers: recalculate_grade_cache → invalidate_course_analytics. Skip a step and data goes stale.
-
-4. **Enrollment State Machine** — Transitions are enforced in views, not models. Django admin bypasses the state machine entirely.
-
-All four are documented in detail in `docs/architecture/modules/cross_cutting.md`.
+A Django learning management system supporting courses, enrollments, assignments, grading, and discussions.
 
 ---
 
@@ -114,9 +8,6 @@ All four are documented in detail in `docs/architecture/modules/cross_cutting.md
 
 ```
 learnhub/
-├── AGENTS.md                              # Codex constitution
-├── CLAUDE.md                              # Claude Code constitution
-├── GEMINI.md                              # Gemini constitution
 ├── config/                                # Django settings, URLs, WSGI
 ├── core/
 │   ├── models.py                          # All 16 models (~950 lines)
@@ -143,11 +34,6 @@ learnhub/
 │       ├── seed_data.py                   # Sample data generator
 │       └── grade_report.py                # Grade reporting
 ├── templates/                             # Tailwind CSS templates
-├── docs/
-│   ├── architecture/modules/              # 9 charter documents
-│   ├── flows/                             # 3 public record documents
-│   ├── procedures/                        # Executable procedures
-│   └── reference-notes/                   # Judgment aids
 └── requirements.txt                       # Django 5.1
 ```
 
@@ -187,12 +73,6 @@ The `seed_data` command creates sample users with password **`testpass123`** for
 | Notifications | Notification, NotificationPreference | In-app notifications with preferences |
 | Analytics | CourseAnalytics | Cached course-level aggregates |
 
-## Further Reading
-
-- Vannevar Bush, [*"As We May Think"*](https://www.theatlantic.com/magazine/archive/1945/07/as-we-may-think/303881/), The Atlantic, July 1945
-- Doug Engelbart, *"Augmenting Human Intellect: A Conceptual Framework"*, SRI, 1962 — extended Bush's vision to interactive computing
-- The constitution itself: start with the active repo-root constitution file and follow the trails
-
 ## License
 
-MIT — use this architecture pattern freely.
+MIT

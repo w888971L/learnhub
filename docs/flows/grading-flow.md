@@ -80,4 +80,3 @@ If an instructor modifies an assignment's rubric after grades exist, all existin
 
 ---
 
-*Charter sources: views_assignments.md, models_assignments.md, infrastructure.md, cross_cutting.md*

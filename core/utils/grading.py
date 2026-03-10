@@ -2,12 +2,10 @@
 Grade calculation engine.
 
 IMPORTANT: Late penalties are applied at GRADING time, not submission time.
-See cross_cutting.md 'Late Penalty Timing'.
 
-This module is a cross-cutting concern: grade calculations affect enrollment
-caches, course analytics, and notification dispatch. Any change to penalty
-logic or aggregation formulas must be validated against all downstream
-consumers.
+Grade calculations affect enrollment caches, course analytics, and
+notification dispatch. Any change to penalty logic or aggregation formulas
+must be validated against all downstream consumers.
 """
 
 import math
@@ -96,7 +94,7 @@ def apply_grade(submission, raw_score, grader):
     to the raw score. Marks the submission as graded, sets ``is_final=True``
     on the new grade, and returns it.
 
-    TRIPWIRE: The penalty is baked into the stored score. If the late-policy
+    WARNING: The penalty is baked into the stored score. If the late-policy
     rules change retroactively, existing grades are **not** automatically
     recalculated — a bulk recalculation must be triggered explicitly.
 
@@ -200,7 +198,7 @@ def bulk_recalculate_course_grades(course):
     """
     Recalculate all enrollment grade caches for a course.
 
-    TRIPWIRE: This function MUST be called after any rubric modification
+    WARNING: This function MUST be called after any rubric modification
     that affects grading. Failure to do so leaves cached grades inconsistent
     with the current rubric.
 

@@ -65,4 +65,3 @@ Instructors can view all enrollments at `/course/<id>/students/` and update stat
 
 ---
 
-*Charter sources: views_courses.md, models_courses.md, infrastructure.md*

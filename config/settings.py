@@ -1,8 +1,7 @@
 """
 Django settings for LearnHub — a course management platform.
 
-This is a template project showcasing constitutional architecture
-for AI-assisted development. SQLite-only, no external services.
+SQLite-only, no external services.
 """
 
 import os
