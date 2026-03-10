@@ -140,3 +140,15 @@ The Django admin panel allows direct editing of all models without business logi
 
 **Current mitigation**: None. The admin is trusted-user-only.
 **Future mitigation**: Custom admin actions that call the proper business logic functions, or read-only admin for sensitive fields.
+
+---
+
+## Known Issues (pending fix)
+
+Identified by Codex audit (2026-03-10). The two HIGH issues (non-final regrade orphaning grades, resubmission double-counting) were fixed in commit `ee4160b`. Three MEDIUM issues remain:
+
+1. **Rubric scoring path is dead.** `GradeForm` has no `rubric_scores` field, so `grade.rubric_scores` is always saved as `None` despite the model supporting it. The view at `grade.py:147` calls `form.cleaned_data.get("rubric_scores")` which always returns `None`. Fix: add a JSONField to GradeForm if rubric support is needed, or remove the dead code path.
+
+2. **seed_data creates grades without cache recalculation.** `seed_data.py` calls `Grade.objects.create()` directly with `is_final=True` but never calls `recalculate_grade_cache()`. Seeded environments start with stale `Enrollment.final_grade_cache` values. Fix: call `bulk_recalculate_course_grades()` at the end of the seed command, or use `apply_grade()` instead of direct creation.
+
+3. **Max-score validation was inactive** (now fixed). `GradeForm` was instantiated without `max_score`, silently skipping the upper-bound check. Fixed in `ee4160b` — `grade_submission()` now passes `assignment.max_score` to the form on both GET and POST paths.

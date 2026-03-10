@@ -9,6 +9,8 @@
 
 Build a lightweight, per-session forensic logging system that captures every tool call an AI agent makes — timestamped, classified by governance relevance, and structured for analysis — without consuming any tokens from the primary agent's context window.
 
+**Why this matters — Memex vs Memory:** The primary motivation for this feature is measuring whether AI agents exhibit *Memex* behavior (following associative trails through governance documents — charters, cross-cutting concerns, tripwires) versus *Memory* behavior (relying on training data and general knowledge without consulting the project's documentation). The constitutional architecture provides a rich set of governance documents designed to guide agent behavior, but without forensic logging there is no way to know whether agents actually read and follow those documents. This logging system makes that distinction observable and measurable: governance read ratios, charter-before-code sequencing, trail following, and tripwire coverage are all derived from the tool-use logs.
+
 ## 1.1 What Actually Happened Here
 
 This plan is the first completed example of multi-agent collaborative development through the constitutional architecture's plans framework. The significance is not the logging feature itself — it's the process that produced it:
