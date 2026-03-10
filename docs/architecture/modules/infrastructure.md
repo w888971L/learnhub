@@ -179,10 +179,16 @@ Reads Codex CLI session transcripts and emits normalized per-session logs to `.c
 Captures `session_start`, `tool_success`, `tool_failure`, and `session_end` from `session_meta`, `function_call` / `function_call_output`, and `custom_tool_call` / `custom_tool_call_output` records.
 ! Failures are inferred from actual transcript outputs (non-zero exit codes or custom-tool metadata). Unmatched calls are not logged as successes.
 
+### extract_gemini_log.py
+Reads Gemini CLI session transcripts from `~/.gemini/tmp/<project>/chats/session-*.json` and emits normalized per-session logs to `.gemini/logs/tool-use-{session_id}.jsonl`.
+Extracts `toolCalls` from each message, maps Gemini tool names (`read_file`, `write_file`, `grep_search`, `run_shell_command`) to action categories, and classifies file paths.
+Usage: `python scripts/extract_gemini_log.py <session.json>` or `--dir <chats-directory>`.
+! This is the preferred logging path for Gemini — it captures all tool calls from transcripts, unlike the self-logging script which depends on the agent remembering to call it.
+
 ### log_gemini_tool.py
-CLI-invocable logger for Gemini sessions. Unlike Claude (hooks) and Codex (extraction), Gemini has no native hook system — tool events are logged via explicit CLI calls: `python scripts/log_gemini_tool.py --event tool_success --tool-name read_file --summary "read(GEMINI.md)"`.
+CLI-invocable logger for Gemini sessions. Intended for real-time self-logging during a session.
 Session ID managed via `.gemini/current_session` file; logs written to `.gemini/logs/tool-use-{session_id}.jsonl`.
-! `get_or_create_session_id()` auto-logs a `session_start` event when creating a new session. Do not also call `--event session_start` manually or you get duplicates.
+! In practice, Gemini logs only a fraction of its tool calls when self-logging. Prefer `extract_gemini_log.py` for forensic analysis.
 
 ### analyze_session.py `--tool-log` flag
 When `--tool-log` is passed, the analyzer reads standardized JSONL tool logs (from any agent) instead of full Claude transcripts.
