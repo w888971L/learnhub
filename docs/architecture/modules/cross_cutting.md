@@ -17,7 +17,7 @@ These MUST stay synchronized. The cache exists for performance (avoids recalcula
 **What breaks**: Any code path that creates, modifies, or deletes a Grade record WITHOUT calling `recalculate_grade_cache(enrollment)` will cause the cache to drift from reality. Students will see stale grades. Analytics will report incorrect data.
 
 **Safe paths** (these call recalculate automatically):
-- `grade_submission()` view → calls `recalculate_grade_cache()` when `is_final=True`
+- `grade_submission()` view → always calls `recalculate_grade_cache()` (even for non-final grades, since `apply_grade()` may have demoted a previous final grade)
 - `bulk_recalculate_course_grades(course)` → rebuilds all enrollments for a course
 
 **Unsafe paths** (manual cache update required):

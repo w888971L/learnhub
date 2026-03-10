@@ -130,42 +130,45 @@ def grade_submission(request, course_id, assignment_id, submission_id):
     existing_grades = submission.grades.order_by("-graded_at")
 
     if request.method == "POST":
-        form = GradeForm(request.POST)
+        form = GradeForm(request.POST, max_score=assignment.max_score)
         if form.is_valid():
             raw_score = form.cleaned_data["score"]
             is_final = form.cleaned_data.get("is_final", False)
 
             # Step 1-2: apply_grade creates the Grade record with late penalty
+            # Pass is_final so apply_grade creates the grade with the correct
+            # finality from the start (avoids demote-then-flip bug).
             grade = apply_grade(
                 submission=submission,
                 raw_score=raw_score,
                 grader=request.user,
+                is_final=is_final,
             )
 
             # Transfer additional form fields to the grade
             grade.feedback = form.cleaned_data.get("feedback", "")
-            grade.rubric_scores = form.cleaned_data.get("rubric_scores")
-            grade.is_final = is_final
-            grade.save(update_fields=["feedback", "rubric_scores", "is_final"])
+            grade.save(update_fields=["feedback"])
 
             # Step 3: update submission status
             submission.status = SubmissionStatus.GRADED
             submission.save(update_fields=["status"])
 
-            # Step 4: if final grade, recalculate cache and notify
+            # Step 4: always recalculate cache — apply_grade may have demoted
+            # a previous final grade, so the cache must be refreshed regardless
+            # of whether the new grade is final.
+            enrollment = Enrollment.objects.filter(
+                student=submission.student,
+                course=course,
+                status__in=[
+                    EnrollmentStatus.ACTIVE,
+                    EnrollmentStatus.COMPLETED,
+                ],
+            ).first()
+
+            if enrollment:
+                recalculate_grade_cache(enrollment)
+
             if is_final:
-                enrollment = Enrollment.objects.filter(
-                    student=submission.student,
-                    course=course,
-                    status__in=[
-                        EnrollmentStatus.ACTIVE,
-                        EnrollmentStatus.COMPLETED,
-                    ],
-                ).first()
-
-                if enrollment:
-                    recalculate_grade_cache(enrollment)
-
                 notify_grade_posted(grade)
 
             # Step 5: invalidate analytics
@@ -183,7 +186,7 @@ def grade_submission(request, course_id, assignment_id, submission_id):
                 assignment_id=assignment.pk,
             )
     else:
-        form = GradeForm()
+        form = GradeForm(max_score=assignment.max_score)
 
     return render(request, "core/grade_form.html", {
         "course": course,

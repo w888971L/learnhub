@@ -88,13 +88,15 @@ def calculate_late_penalty(submission):
 # ---------------------------------------------------------------------------
 
 
-def apply_grade(submission, raw_score, grader):
+def apply_grade(submission, raw_score, grader, is_final=True):
     """
-    Create a final :class:`Grade` record for the given submission.
+    Create a :class:`Grade` record for the given submission.
 
     Applies the late penalty (computed at grading time, NOT submission time)
-    to the raw score. Marks the submission as graded, sets ``is_final=True``
-    on the new grade, and returns it.
+    to the raw score. Marks the submission as graded and returns the new
+    grade. Also demotes any previous final grades for this submission AND
+    any final grades on other versions of the same assignment by the same
+    student, preventing double-counting in course grade aggregation.
 
     TRIPWIRE: The penalty is baked into the stored score. If the late-policy
     rules change retroactively, existing grades are **not** automatically
@@ -104,6 +106,7 @@ def apply_grade(submission, raw_score, grader):
         submission: The :class:`Submission` to grade.
         raw_score: Numeric score before penalty (Decimal or float).
         grader: The :class:`User` who is issuing the grade.
+        is_final: Whether this grade should be marked as final.
 
     Returns:
         Grade: The newly created Grade instance.
@@ -115,14 +118,23 @@ def apply_grade(submission, raw_score, grader):
     # Ensure the adjusted score doesn't go below zero
     adjusted_score = max(adjusted_score, Decimal("0.00"))
 
-    # Mark any previous final grades for this submission as non-final
+    # Demote any previous final grades for this submission
     Grade.objects.filter(submission=submission, is_final=True).update(is_final=False)
+
+    # Also demote final grades on OTHER versions of the same assignment
+    # by the same student — prevents double-counting in course grade
+    # aggregation when resubmissions exist.
+    Grade.objects.filter(
+        submission__student=submission.student,
+        submission__assignment=submission.assignment,
+        is_final=True,
+    ).update(is_final=False)
 
     grade = Grade.objects.create(
         submission=submission,
         grader=grader,
         score=adjusted_score,
-        is_final=True,
+        is_final=is_final,
     )
 
     # Update submission status

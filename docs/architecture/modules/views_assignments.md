@@ -50,15 +50,15 @@ Template: core/submission_list.html
 ### grade_submission [L98]
 GET/POST: Instructor grades a single submission.
 Decorators: @login_required, @instructor_required
-Form: GradeForm (score, feedback, rubric_scores, is_final)
+Form: GradeForm (score, feedback, is_final) — instantiated with max_score=assignment.max_score for validation
 
 ! TRIPWIRE — This is the critical grading path. The sequence matters:
 
 **Grading flow (5 steps, strict order):**
-1. Validate GradeForm (score, feedback, rubric_scores, is_final)
-2. Call `apply_grade(submission, raw_score, grader)` → this applies late penalty via `calculate_late_penalty()`. The score stored in Grade may be LOWER than what the instructor entered.
+1. Validate GradeForm (score, feedback, is_final) with max_score bound
+2. Call `apply_grade(submission, raw_score, grader, is_final)` → this applies late penalty via `calculate_late_penalty()`. The score stored in Grade may be LOWER than what the instructor entered. Also demotes any previous final grades across ALL versions of this assignment for this student (prevents resubmission double-counting).
 3. Update submission.status = 'graded', save
-4. If grade.is_final: call `recalculate_grade_cache(enrollment)` → updates Enrollment.final_grade_cache. Call `notify_grade_posted(grade)` → notifies student.
+4. Always call `recalculate_grade_cache(enrollment)` → updates Enrollment.final_grade_cache. This runs even for non-final grades because apply_grade may have demoted a previous final grade. If is_final: also call `notify_grade_posted(grade)`.
 5. Call `invalidate_course_analytics(course)` → marks CourseAnalytics as stale
 
 **Why this order matters:**

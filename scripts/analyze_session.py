@@ -243,9 +243,20 @@ def analyze_tool_log(jsonl_path: str) -> SessionAnalysis:
         analysis.tool_sequence.append(seq_entry)
 
         # Count by type
-        # In standardized logs, we map names to normalized types
+        # For Codex, tool_name is always "shell_command" — use the summary
+        # to infer the action kind (e.g., "shell_command:read(...)")
         norm_name = tc.tool_name.lower()
-        if any(x in norm_name for x in ("read", "cat", "get-content")):
+        summary_lower = (tc.description or "").lower()
+        if norm_name == "shell_command":
+            # Extract action kind from summary like "shell_command:read(...)"
+            action = summary_lower.split("(")[0].split(":")[-1].strip()
+            # Codex "other" with Get-Content is actually a read
+            if action == "other" and "get-content" in summary_lower:
+                action = "read"
+        else:
+            action = norm_name
+
+        if any(x in action for x in ("read", "cat", "get-content")):
             analysis.total_reads += 1
             if tc.file_class == "governance":
                 analysis.governance_reads += 1
@@ -257,7 +268,7 @@ def analyze_tool_log(jsonl_path: str) -> SessionAnalysis:
                 analysis.flow_reads += 1
             else:
                 analysis.code_reads += 1
-        elif any(x in norm_name for x in ("edit", "write", "patch", "replace")):
+        elif any(x in action for x in ("edit", "write", "patch", "replace")):
             analysis.total_edits += 1
             if tc.file_class == "governance":
                 analysis.governance_edits += 1
@@ -265,8 +276,15 @@ def analyze_tool_log(jsonl_path: str) -> SessionAnalysis:
                 analysis.code_edits += 1
                 if analysis.first_code_edit_index is None:
                     analysis.first_code_edit_index = tc.index
-        elif any(x in norm_name for x in ("grep", "glob", "search", "find")):
+        elif any(x in action for x in ("grep", "glob", "search", "find")):
             analysis.total_searches += 1
+        elif any(x in action for x in ("bash", "shell", "run", "other")):
+            analysis.total_bash += 1
+        elif "agent" in action:
+            analysis.total_agents += 1
+        elif norm_name == "shell_command":
+            # Fallback: shell_command with no recognized action kind
+            analysis.total_bash += 1
         elif any(x in norm_name for x in ("bash", "shell", "run")):
             analysis.total_bash += 1
         elif "agent" in norm_name:

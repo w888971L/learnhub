@@ -66,15 +66,16 @@ Returns penalty multiplier (0.0 to 1.0). Logic:
 - late_policy == 'penalize' → days_late * LATE_PENALTY_PER_DAY, capped at MAX_LATE_DAYS * rate
 Uses `LEARNHUB_SETTINGS` from Django settings.
 
-### apply_grade(submission, raw_score, grader) [L91]
+### apply_grade(submission, raw_score, grader, is_final=True) [L91]
 Creates Grade record with penalty-adjusted score. Sequence:
 1. penalty = calculate_late_penalty(submission)
 2. final_score = raw_score * (1 - penalty), rounded with ROUND_HALF_UP, floored at 0.00
-3. Marks any previous final grades for this submission as non-final
-4. Grade.objects.create(submission=, grader=, score=final_score, is_final=True)
-5. Updates submission.status to 'graded'
+3. Demotes any previous final grades for this submission as non-final
+4. Demotes any final grades on OTHER versions of the same assignment by the same student (prevents resubmission double-counting)
+5. Grade.objects.create(submission=, grader=, score=final_score, is_final=is_final)
+6. Updates submission.status to 'graded'
 Returns the Grade.
-! The instructor sees the raw_score in the form, but the stored Grade.score is penalty-adjusted. Note: `grade_submission()` view may overwrite `is_final` with the form value after creation.
+! The instructor sees the raw_score in the form, but the stored Grade.score is penalty-adjusted. The caller (grade_submission view) always recalculates the enrollment cache after this call, since step 3-4 may have demoted a previous final grade.
 → see cross_cutting.md "Late Penalty Timing"
 
 ### calculate_course_grade(enrollment) [L140]
