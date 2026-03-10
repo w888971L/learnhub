@@ -6,6 +6,10 @@
 
 ---
 
+## Original Request
+
+> Paste or paraphrase the human operator's original request here, as-is. Capture the intent before it gets refined.
+
 ## Problem Statement
 
 What needs to change and why. One paragraph max. Link to an issue or conversation if relevant.

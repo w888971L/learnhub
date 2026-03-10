@@ -41,4 +41,4 @@ docs/plans/
 
 | Date | Title | Status | Decision |
 |------|-------|--------|----------|
-| (none yet) | | | |
+| 2026-03-10 | [Per-Session Tool-Use Logging](2026-03-10-session-tool-logging/plan.md) | under-review | pending |
