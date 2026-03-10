@@ -45,6 +45,7 @@ Guidelines:
 - Be opinionated about design quality
 - Highlight connections to other domains that would surprise a newcomer
 - If you find something the charter doesn't document, note it as a finding
+- Include an Author line in the metadata header identifying which agent produced the briefing
 - Target length: 800-1500 words
 ```
 
@@ -52,6 +53,7 @@ Guidelines:
 
 Write to `docs/briefings/[scope-name].md` with metadata header:
 ```
+Author: [agent name] (e.g., Claude, Codex, Gemini)
 Last produced: YYYY-MM-DD
 Charter sources: [list]
 ```
