@@ -9,6 +9,21 @@
 
 Build a lightweight, per-session forensic logging system that captures every tool call an AI agent makes — timestamped, classified by governance relevance, and structured for analysis — without consuming any tokens from the primary agent's context window.
 
+## 1.1 What Actually Happened Here
+
+This plan is the first completed example of multi-agent collaborative development through the constitutional architecture's plans framework. The significance is not the logging feature itself — it's the process that produced it:
+
+- **Three independent AI agents** (Claude, Codex, Gemini) each authored separate plans for the same problem, without seeing each other's work in advance.
+- **Two agents reviewed** the others' proposals, producing formal critiques with specific technical objections.
+- **Agents debated through documents** — Claude responded to Codex's review, Codex responded to Claude's response, and the positions converged through written deliberation (`deliberations.md`).
+- **A human operator** read all proposals, reviews, and deliberations, then issued a single decision document selecting the consensus plan and assigning phases to specific agents.
+- **Agents executed assigned phases** in sequence, checking `status.md` to know what was done and what remained. No agent needed to be told what to do — the plan directory contained everything.
+- **A senior architect role** (Claude, in a separate session) reviewed each agent's completed work before committing — catching process gaps, fake commit hashes, missing documentation, and a duplicate-event bug.
+
+The coordination mechanism was entirely document-based. No shared memory, no API calls between agents, no real-time communication. Each agent read files, did its work, and left artifacts for the next agent. The human operator's role was decision-making and sequencing, not implementation.
+
+This is, to our knowledge, a novel pattern: AI agents collaborating on a shared codebase through a governance framework that mirrors how human engineering teams use design docs, code review, and project tracking — but adapted for agents that have no persistent memory and must reconstruct context from documents every session.
+
 ## 2. Deliberation Summary
 
 Three agents proposed plans independently, then reviewed and refined each other's work.
@@ -191,4 +206,10 @@ This was the first real test of the `docs/plans/` deliberation framework. Observ
 
 ## 7. Conclusion
 
-The plan achieved its objective: all three agents now produce per-session tool-use logs in a shared JSONL schema, with governance classification at write time and zero token cost to the primary agent. The deliberation process — three proposals, two reviews, a convergence arc, and a human decision — produced a stronger design than any single agent would have delivered alone. The plans framework itself proved viable as a coordination mechanism for multi-agent work.
+The plan achieved its technical objective: all three agents now produce per-session tool-use logs in a shared JSONL schema, with governance classification at write time and zero token cost to the primary agent.
+
+But the larger result is the demonstrated viability of document-mediated multi-agent collaboration. Three AI agents — each with different capabilities, different platform constraints, and no shared memory — proposed competing designs, debated through written artifacts, converged on a hybrid approach, divided labor across four phases, executed their assigned work with handoffs tracked through status files, and had each delivery reviewed by a senior architect role before integration. The human operator's involvement was strategic (decisions, sequencing, quality gates), not tactical (no line-by-line direction).
+
+This pattern — constitutional governance, formal deliberation, phased execution, document-based coordination — produced a stronger design than any single agent proposed, caught process failures that would have gone unnoticed in solo execution, and left a complete decision trail that any future agent can read to understand not just *what* was built, but *why* each design choice was made.
+
+The logging feature is useful. The process that built it may be more significant.
