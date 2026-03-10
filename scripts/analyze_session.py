@@ -20,7 +20,6 @@ import csv
 import io
 import json
 import os
-import re
 import sys
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field, asdict
@@ -29,89 +28,16 @@ from io import StringIO
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Optional
 
-
-# ---------------------------------------------------------------------------
-# Governance file classification
-# ---------------------------------------------------------------------------
-
-# Patterns that identify governance/constitutional files (case-insensitive)
-GOVERNANCE_PATH_PATTERNS = [
-    r"docs/architecture/",
-    r"docs/procedures/",
-    r"docs/reference-notes/",
-    r"\.claude/commands/",
-    r"CLAUDE\.md$",
-    r"GEMINI\.md$",
-    r"AGENTS\.md$",
-    r"cross_cutting\.md",
-]
-
-# Patterns for flow docs (governance-adjacent but human-facing)
-FLOW_PATH_PATTERNS = [
-    r"docs/flows/",
-]
-
-# Patterns for experiment/study docs
-EXPERIMENT_PATH_PATTERNS = [
-    r"docs/experiments/",
-    r"docs/control-study/",
-]
-
-# Constitutional terminology in text content
-CONSTITUTIONAL_TERMS = [
-    r"\btripwire\b",
-    r"\bcharter\b",
-    r"\bconstitution(?:al)?\b",
-    r"\bcross[_-]cutting\b",
-    r"\benforcer\b",
-    r"\bgrade\s+cascade\b",
-    r"\bgrade\s+cache\s+duality\b",
-    r"\blate\s+penalty\s+timing\b",
-    r"\bpropagation\s+map\b",
-    r"\bliving\s+docs\b",
-    r"\bdispatch\s+table\b",
-    r"\bmemex\b",
-]
-
-CONSTITUTIONAL_TERM_PATTERNS = [re.compile(p, re.IGNORECASE) for p in CONSTITUTIONAL_TERMS]
-
-
-def normalize_path(raw_path: str) -> str:
-    """Normalize a file path to forward-slash POSIX style for consistent matching."""
-    return raw_path.replace("\\", "/")
-
-
-def classify_file(path: str) -> str:
-    """Classify a file path as 'governance', 'flow', 'experiment', or 'code'."""
-    normed = normalize_path(path)
-    for pat in GOVERNANCE_PATH_PATTERNS:
-        if re.search(pat, normed, re.IGNORECASE):
-            return "governance"
-    for pat in FLOW_PATH_PATTERNS:
-        if re.search(pat, normed, re.IGNORECASE):
-            return "flow"
-    for pat in EXPERIMENT_PATH_PATTERNS:
-        if re.search(pat, normed, re.IGNORECASE):
-            return "experiment"
-    return "code"
-
-
-def extract_filename(path: str) -> str:
-    """Extract just the filename from a full path."""
-    normed = normalize_path(path)
-    return normed.rsplit("/", 1)[-1] if "/" in normed else normed
-
-
-def count_constitutional_terms(text: str) -> dict[str, int]:
-    """Count occurrences of constitutional terminology in text."""
-    counts = {}
-    for pat in CONSTITUTIONAL_TERM_PATTERNS:
-        matches = pat.findall(text)
-        if matches:
-            # Use the pattern's source as key, cleaned up
-            term = pat.pattern.replace(r"\b", "").replace(r"\s+", " ")
-            counts[term] = len(matches)
-    return counts
+# Shared classification — single source of truth
+from scripts.classify import (
+    classify_file,
+    count_constitutional_terms,
+    detect_tripwire_coverage,
+    extract_filename,
+    normalize_path,
+    KNOWN_CROSS_REFS,
+    TRIPWIRE_PATTERNS,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -201,73 +127,6 @@ class SessionAnalysis:
 
     # Tripwire coverage
     tripwires_addressed: list = field(default_factory=list)
-
-
-# ---------------------------------------------------------------------------
-# Known cross-references in the governance docs
-# (source file -> list of files it references)
-# ---------------------------------------------------------------------------
-
-KNOWN_CROSS_REFS = {
-    "CLAUDE.md": [
-        "cross_cutting.md",
-        "models_accounts.md", "models_courses.md", "models_assignments.md",
-        "views_courses.md", "views_assignments.md", "views_discussions.md",
-        "views_api.md", "infrastructure.md",
-        "about.md", "briefing.md", "perusal.md", "full-review.md",
-        "risk-awareness.md", "starter-kit.md",
-    ],
-    "GEMINI.md": [
-        "cross_cutting.md",
-        "models_accounts.md", "models_courses.md", "models_assignments.md",
-        "views_courses.md", "views_assignments.md", "views_discussions.md",
-        "views_api.md", "infrastructure.md",
-    ],
-    "AGENTS.md": [
-        "cross_cutting.md",
-        "models_accounts.md", "models_courses.md", "models_assignments.md",
-        "views_courses.md", "views_assignments.md", "views_discussions.md",
-        "views_api.md", "infrastructure.md",
-    ],
-    "cross_cutting.md": [
-        "models_courses.md", "models_assignments.md",
-        "views_courses.md", "views_assignments.md",
-        "infrastructure.md",
-    ],
-    "views_assignments.md": ["models_assignments.md", "infrastructure.md", "cross_cutting.md"],
-    "views_courses.md": ["models_courses.md", "infrastructure.md", "cross_cutting.md"],
-    "models_assignments.md": ["cross_cutting.md"],
-    "models_courses.md": ["cross_cutting.md"],
-    "infrastructure.md": ["cross_cutting.md"],
-}
-
-# The four main tripwires
-TRIPWIRE_PATTERNS = {
-    "Grade Cache Duality": [
-        r"grade\s*cache\s*duality",
-        r"final_grade_cache",
-        r"recalculate_grade_cache",
-        r"cached\s+aggregate",
-        r"source\s+of\s+truth.*grade\s+records",
-    ],
-    "Late Penalty Timing": [
-        r"late\s*penalty\s*timing",
-        r"penalty.*grading\s+time",
-        r"penalty.*not\s+submission\s+time",
-        r"applied\s+at\s+grad(?:e|ing)\s+time",
-    ],
-    "Grade Cascade": [
-        r"grade\s*cascade",
-        r"recalculate_grade_cache.*invalidate_course_analytics",
-        r"invalidate.*analytics.*after.*grade",
-    ],
-    "Enrollment State Machine": [
-        r"enrollment\s+state\s+machine",
-        r"transitions.*enforced\s+in\s+views",
-        r"admin\s+bypasses.*state\s+machine",
-        r"pending.*active.*completed.*dropped",
-    ],
-}
 
 
 # ---------------------------------------------------------------------------
@@ -381,17 +240,6 @@ def detect_trails(calls: list[ToolCall]) -> list[TrailHop]:
             read_history.append((tc.index, fname))
 
     return trails
-
-
-def detect_tripwire_coverage(assistant_text: str) -> list[str]:
-    """Check which of the four main tripwires are addressed in assistant output."""
-    addressed = []
-    for tripwire_name, patterns in TRIPWIRE_PATTERNS.items():
-        for pat in patterns:
-            if re.search(pat, assistant_text, re.IGNORECASE):
-                addressed.append(tripwire_name)
-                break
-    return addressed
 
 
 def analyze_session(jsonl_path: str) -> SessionAnalysis:
