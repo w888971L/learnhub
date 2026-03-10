@@ -191,6 +191,7 @@ The `seed_data` command creates sample users with password **`testpass123`** for
 
 - Vannevar Bush, [*"As We May Think"*](https://www.theatlantic.com/magazine/archive/1945/07/as-we-may-think/303881/), The Atlantic, July 1945
 - Doug Engelbart, *"Augmenting Human Intellect: A Conceptual Framework"*, SRI, 1962 — extended Bush's vision to interactive computing
+- Cumberland Laboratories, [*"Constitutional Architecture for AI-Assisted Development"*](https://cumberlandlaboratories.substack.com/p/constitutional-architecture-for-ai) — the source paper describing this governance pattern
 - The constitution itself: start with the active repo-root constitution file and follow the trails
 
 ## License
