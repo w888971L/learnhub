@@ -169,6 +169,127 @@ def extract_tool_calls(jsonl_path: str) -> tuple[list[ToolCall], str]:
     return calls, "\n".join(assistant_text)
 
 
+def extract_from_tool_log(jsonl_path: str) -> list[ToolCall]:
+    """Parse a standardized JSONL tool-use log and extract ToolCalls."""
+    calls = []
+    idx = 0
+
+    with open(jsonl_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+
+            event_type = obj.get("event_type")
+            if event_type not in ("tool_success", "tool_failure"):
+                continue
+
+            ts = obj.get("timestamp", "")
+            name = obj.get("tool_name", "unknown")
+            status = obj.get("status", "success")
+            file_paths = obj.get("file_paths", [])
+            file_classes = obj.get("file_classes", [])
+
+            # Map standardized tool log to ToolCall
+            # Note: standardized log uses different tool names/schema than transcript
+            # but we normalize here to match analyze_session's expectations.
+            tc = ToolCall(
+                index=idx,
+                timestamp=ts,
+                tool_name=name,
+                file_path=file_paths[0] if file_paths else None,
+                file_class=file_classes[0] if file_classes else None,
+                description=obj.get("summary", ""),
+                caller_type="direct"  # logs are usually flattened
+            )
+            calls.append(tc)
+            idx += 1
+
+    return calls
+
+
+def analyze_tool_log(jsonl_path: str) -> SessionAnalysis:
+    """Perform analysis of a standardized tool log."""
+    calls = extract_from_tool_log(jsonl_path)
+
+    session_id = Path(jsonl_path).stem
+    if session_id.startswith("tool-use-"):
+        session_id = session_id.replace("tool-use-", "")
+
+    analysis = SessionAnalysis(
+        session_file=jsonl_path,
+        session_id=session_id,
+        total_tool_calls=len(calls),
+        tool_calls=calls,
+    )
+
+    if calls:
+        analysis.start_time = calls[0].timestamp
+        analysis.end_time = calls[-1].timestamp
+
+    gov_files_seen = set()
+
+    for tc in calls:
+        # Build compact sequence
+        seq_entry = tc.tool_name
+        if tc.file_path:
+            seq_entry += f"({extract_filename(tc.file_path)})"
+        elif tc.description:
+            seq_entry += f"({tc.description[:40]})"
+        analysis.tool_sequence.append(seq_entry)
+
+        # Count by type
+        # In standardized logs, we map names to normalized types
+        norm_name = tc.tool_name.lower()
+        if any(x in norm_name for x in ("read", "cat", "get-content")):
+            analysis.total_reads += 1
+            if tc.file_class == "governance":
+                analysis.governance_reads += 1
+                if analysis.first_governance_read_index is None:
+                    analysis.first_governance_read_index = tc.index
+                if tc.file_path:
+                    gov_files_seen.add(extract_filename(tc.file_path))
+            elif tc.file_class == "flow":
+                analysis.flow_reads += 1
+            else:
+                analysis.code_reads += 1
+        elif any(x in norm_name for x in ("edit", "write", "patch", "replace")):
+            analysis.total_edits += 1
+            if tc.file_class == "governance":
+                analysis.governance_edits += 1
+            else:
+                analysis.code_edits += 1
+                if analysis.first_code_edit_index is None:
+                    analysis.first_code_edit_index = tc.index
+        elif any(x in norm_name for x in ("grep", "glob", "search", "find")):
+            analysis.total_searches += 1
+        elif any(x in norm_name for x in ("bash", "shell", "run")):
+            analysis.total_bash += 1
+        elif "agent" in norm_name:
+            analysis.total_agents += 1
+
+    analysis.governance_files_accessed = sorted(gov_files_seen)
+
+    # Did governance reads happen before first code edit?
+    if (analysis.first_governance_read_index is not None
+            and analysis.first_code_edit_index is not None):
+        analysis.governance_read_before_code_edit = (
+            analysis.first_governance_read_index < analysis.first_code_edit_index
+        )
+
+    # Trail detection
+    analysis.trails_detected = detect_trails(calls)
+
+    # Note: Assistant text indicators (terminology, tripwires) are unavailable in tool-only logs
+    # and will default to zero/empty.
+
+    return analysis
+
+
 def _parse_tool_block(block: dict, idx: int, timestamp: str) -> ToolCall:
     """Parse a single tool_use block into a ToolCall."""
     name = block.get("name", "unknown")
@@ -559,6 +680,7 @@ def main():
     )
     parser.add_argument("session", nargs="?", help="Path to a single .jsonl session file")
     parser.add_argument("--dir", help="Analyze all .jsonl files in a directory")
+    parser.add_argument("--tool-log", action="store_true", help="Input is a standardized JSONL tool-use log instead of a full transcript")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     parser.add_argument("--csv", action="store_true", help="Output as CSV (best with --dir)")
     args = parser.parse_args()
@@ -581,7 +703,10 @@ def main():
     analyses = []
     for fp in files:
         try:
-            a = analyze_session(str(fp))
+            if args.tool_log:
+                a = analyze_tool_log(str(fp))
+            else:
+                a = analyze_session(str(fp))
             analyses.append(a)
         except Exception as e:
             print(f"Error analyzing {fp}: {e}", file=sys.stderr)

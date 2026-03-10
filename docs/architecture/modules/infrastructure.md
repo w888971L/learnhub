@@ -177,3 +177,13 @@ Supports multi-file events via `file_paths` and auto-classifies `file_classes`.
 Reads Codex CLI session transcripts and emits normalized per-session logs to `.codex/logs/tool-use-{session_id}.jsonl`.
 Captures `session_start`, `tool_success`, `tool_failure`, and `session_end` from `session_meta`, `function_call` / `function_call_output`, and `custom_tool_call` / `custom_tool_call_output` records.
 ! Failures are inferred from actual transcript outputs (non-zero exit codes or custom-tool metadata). Unmatched calls are not logged as successes.
+
+### log_gemini_tool.py
+CLI-invocable logger for Gemini sessions. Unlike Claude (hooks) and Codex (extraction), Gemini has no native hook system — tool events are logged via explicit CLI calls: `python scripts/log_gemini_tool.py --event tool_success --tool-name read_file --summary "read(GEMINI.md)"`.
+Session ID managed via `.gemini/current_session` file; logs written to `.gemini/logs/tool-use-{session_id}.jsonl`.
+! `get_or_create_session_id()` auto-logs a `session_start` event when creating a new session. Do not also call `--event session_start` manually or you get duplicates.
+
+### analyze_session.py `--tool-log` flag
+When `--tool-log` is passed, the analyzer reads standardized JSONL tool logs (from any agent) instead of full Claude transcripts.
+Uses `extract_from_tool_log()` → `analyze_tool_log()` path. Maps tool names to read/edit/search/bash categories via keyword matching.
+! Assistant text analysis (terminology usage, tripwire coverage) is unavailable from tool-only logs — those fields will be zero/empty.

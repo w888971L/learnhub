@@ -32,3 +32,7 @@ Thumbs.db
 
 # Codex
 .codex/logs/
+
+# Gemini
+.gemini/logs/
+.gemini/current_session
