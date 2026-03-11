@@ -58,6 +58,18 @@ Creates Grade record with penalty-adjusted score.
 
 **The propagation map** tracks how changes ripple through the knowledge layer — when a charter changes, which downstream documents need updating. Bush envisioned trails as static once created. The propagation map makes them *maintainable*.
 
+### Why Now — The Super-Archivist
+
+Bush could not build the Memex. The physics of 1945 were not the obstacle — the *labor* was. Creating associative trails between documents, maintaining them as knowledge evolved, verifying their consistency — this required a dedicated archivist who could read everything, understand the connections, and update them in real time. No human could do this at scale. The trails would go stale, the links would rot, and the Memex would decay into a filing cabinet with dead references.
+
+For eighty years, that problem had no solution. Until now.
+
+AI coding agents are the first workers capable of serving as both **knowledge consumers and knowledge curators** simultaneously. When an agent follows a charter's cross-reference to discover a tripwire, it is *using* the Memex. When that same agent updates the charter after changing the code it describes, it is *maintaining* the Memex. This dual role — reader and archivist in the same action — is what makes constitutional architecture viable where Bush's original vision was not.
+
+The constitution encodes this as a rule: *make the change, then update the knowledge layer*. The agent doesn't maintain the Memex as a separate task — it maintains the Memex as a natural consequence of doing its work. The living docs update chain (code change → charter update → flow doc update) is not bureaucracy. It is the mechanism that keeps the associative trails alive.
+
+This is the specific break from conventional agent memory. Most approaches to inter-session agent memory focus on *loading* — vector stores, RAG pipelines, embedding retrieval, session summaries injected into context. They solve the problem of "how do I get relevant information in front of the agent?" Constitutional architecture solves a different problem: **"how does the agent know what to look for before it looks?"** The constitution, charters, and cross-references act as *routing indexes* — cheat cards that narrow the search space before the agent reads a single line of code. An agent doesn't need the entire codebase retrieved into its context. It needs to know that touching the grading flow requires reading three specific documents first, that a cached value is not the source of truth, and that a cascade of side effects must be triggered in a specific order. The Memex provides this orientation layer, and because the agents maintain it as they work, it stays current without an external retrieval system.
+
 ### What This Is Not
 
 - **Not prompt engineering.** Prompts tell an AI what to *do*. The constitution tells it what to *know*. Knowledge shapes judgment across every task, not just the one a prompt was written for.
