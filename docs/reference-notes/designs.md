@@ -13,6 +13,7 @@
 - **`prototypes/bites.md`** — mobile-friendly micro-briefings for quick operator orientation
 - **`prototypes/mobile-operator.md`** — managing the full agent team from a phone via text conversation
 - **`prototypes/protocol-vocabulary.md`** — domain-specific language for operator-agent communication modes
+- **`prototypes/outlier-detection.md`** — specialized enforcers that spot structural anomalies in the knowledge graph
 - **`prototypes/zoom.md`** — visual zoom interface for navigating the knowledge graph from domains down to code
 
 ## Relationship to Plans
