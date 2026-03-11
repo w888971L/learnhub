@@ -42,3 +42,4 @@ docs/plans/
 | Date | Title | Status | Decision |
 |------|-------|--------|----------|
 | 2026-03-10 | [Per-Session Tool-Use Logging](2026-03-10-session-tool-logging/plan.md) | approved | [decision.md](2026-03-10-session-tool-logging/decision.md) |
+| 2026-03-11 | [Memex Architecture Refactor](2026-03-11-memex-architecture-refactor/plan.md) | draft | pending |

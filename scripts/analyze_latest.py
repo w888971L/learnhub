@@ -31,6 +31,7 @@ if str(PROJECT_ROOT) not in sys.path:
 # ---------------------------------------------------------------------------
 
 CLAUDE_LOG_DIR = PROJECT_ROOT / ".claude" / "logs"
+CLAUDE_PROJECTS_BASE = Path.home() / ".claude" / "projects"
 
 CODEX_SESSION_BASE = Path.home() / ".codex" / "sessions"
 CODEX_LOG_DIR = PROJECT_ROOT / ".codex" / "logs"
@@ -39,8 +40,17 @@ GEMINI_CHATS_BASE = Path.home() / ".gemini" / "tmp"
 GEMINI_LOG_DIR = PROJECT_ROOT / ".gemini" / "logs"
 
 
-def find_latest_claude_log() -> Path | None:
-    """Find the most recent Claude tool-use log."""
+def find_latest_claude_log(project: str | None = None) -> Path | None:
+    """Find the most recent Claude tool-use log.
+
+    If project is specified, look for native Claude transcripts for that project
+    and extract them. Otherwise, use the hook-generated logs in .claude/logs/.
+    """
+    if project:
+        # Use the extract_claude_log module to find native transcripts
+        from scripts.extract_claude_log import find_latest_session
+        return find_latest_session(project)
+
     if not CLAUDE_LOG_DIR.exists():
         return None
     logs = sorted(CLAUDE_LOG_DIR.glob("tool-use-*.jsonl"), key=lambda p: p.stat().st_mtime)
@@ -66,6 +76,21 @@ def find_latest_gemini_session(project: str | None = None) -> Path | None:
             if sessions and (latest is None or sessions[-1].stat().st_mtime > latest.stat().st_mtime):
                 latest = sessions[-1]
     return latest
+
+
+def extract_claude(session_path: Path) -> Path | None:
+    """Extract a Claude native session transcript and return the output log path."""
+    result = subprocess.run(
+        [sys.executable, str(PROJECT_ROOT / "scripts" / "extract_claude_log.py"), str(session_path)],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    if result.returncode != 0:
+        print(f"Claude extraction failed: {result.stderr}", file=sys.stderr)
+        return None
+    print(result.stdout.strip(), file=sys.stderr)
+
+    logs = sorted(CLAUDE_LOG_DIR.glob("tool-use-*.jsonl"), key=lambda p: p.stat().st_mtime)
+    return logs[-1] if logs else None
 
 
 def extract_codex(session_path: Path) -> Path | None:
@@ -134,9 +159,19 @@ def process_agent(agent: str, output_json: bool = False,
     log_path = None
 
     if agent == "claude":
-        log_path = find_latest_claude_log()
-        if not log_path:
-            return agent, "No Claude logs found in .claude/logs/"
+        session_path = find_latest_claude_log(project=project)
+        if not session_path:
+            target = f"project '{project}'" if project else ".claude/logs/"
+            return agent, f"No Claude logs found in {target}"
+
+        # If this is a native transcript (not a tool-use log), extract it first
+        if project and session_path.suffix == ".jsonl" and "tool-use-" not in session_path.name:
+            print(f"Extracting Claude session: {session_path.name}", file=sys.stderr)
+            log_path = extract_claude(session_path)
+            if not log_path:
+                return agent, "Claude extraction failed"
+        else:
+            log_path = session_path
 
     elif agent == "codex":
         session = find_latest_codex_session()
