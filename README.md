@@ -1,5 +1,7 @@
 # LearnHub
 
+> **[Development Log](docs/dev-log.md)** — daily summaries of what changed and why.
+
 A Django learning management system — and a reference implementation for **constitutional architecture**, a governance pattern for AI-assisted software development.
 
 The application is real and functional (courses, enrollments, assignments, grading, discussions). The architecture documentation is the showcase.
