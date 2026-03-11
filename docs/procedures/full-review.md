@@ -29,6 +29,8 @@ For each charter, verify:
 
 **5. Fix and update** — edit charters, update "Last verified" dates.
 
+**6. Close out the scratchpad** — after all fixes land, truncate the scratchpad to a dated one-line summary (e.g., "2026-03-08: Full review complete. 9 charters reviewed, 76+ issues found and fixed. See git history for details."). The full review detail lives in git history, not in the working tree. A stale scratchpad with resolved findings is a governance hazard — future agents may mistake historical issues for current drift.
+
 ## Grouping Heuristic
 
 Batch by data proximity:
