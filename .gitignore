@@ -36,3 +36,6 @@ Thumbs.db
 # Gemini
 .gemini/logs/
 .gemini/current_session
+
+# Design prototypes (local only)
+docs/designs/prototypes/
