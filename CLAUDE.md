@@ -134,6 +134,7 @@ Procedures and reference notes are **not** loaded by default. Consult them when 
 | Reviewing another agent's plan | Deliberation | Plan Review | `docs/plans/_TEMPLATES/review.md` |
 | After completing a plan, before presenting to human | Reference Note | Risk Awareness | `docs/reference-notes/risk-awareness.md` |
 | Bootstrapping constitutional architecture on a new codebase | Reference Note | Starter Kit | `docs/reference-notes/starter-kit.md` |
+| Brainstorming, evaluating early-stage ideas, or finding the project mission | Reference Note | Designs | `docs/reference-notes/designs.md` |
 
 **Skill shortcuts**: `/about`, `/briefing <scope>`, `/peruse <file>`, `/review-charters` — thin wrappers in `.claude/commands/` that invoke the corresponding procedure.
 
