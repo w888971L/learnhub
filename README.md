@@ -1,5 +1,7 @@
 # LearnHub
 
+> **[Try the Features](FEATURES.md)** — clone the repo and experience constitutional architecture in action.
+>
 > **[Development Log](docs/dev-log.md)** — daily summaries of what changed and why.
 
 A Django learning management system — and a reference implementation for **constitutional architecture**, a governance pattern for AI-assisted software development.
