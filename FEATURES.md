@@ -88,18 +88,6 @@ The second agent reads the plan, evaluates it against the charters and cross-cut
 
 ---
 
-## Independent Enforcement
-
-Run an enforcer — a *different* model than the one that did the work — to verify consistency:
-
-> "Run enforcement checks: do the charters match the code? Was the living docs chain followed?"
-
-The enforcer isn't checking whether the code is good. It's checking whether the knowledge layer accurately describes the code. A model reviewing its own output shares its blind spots — enforcement requires a different model entirely.
-
-**What to notice:** This is the separation of powers. The agent that writes is not the agent that audits.
-
----
-
 ## What You're Seeing
 
 These aren't plugins, extensions, or custom tooling. Every feature above is powered by markdown files in the `docs/` directory that agents read, reason against, and maintain.
