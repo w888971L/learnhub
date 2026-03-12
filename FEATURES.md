@@ -1,18 +1,16 @@
 # Features — Try These
 
-Clone this repo. Open a session with any supported AI agent (Claude Code, Codex, Gemini). Try the commands below and watch what happens.
+Clone this repo. Open a session with any supported AI agent (Claude Code, Codex, Gemini). Try the prompts below and watch what happens.
 
 No setup required beyond the agent itself. The constitutional architecture is already in the repo.
 
-**A note on skills:** Some features below are invoked via `/commands`. The commands themselves are thin wrappers — a few lines that point the agent at a procedure. The feature isn't the skill. The feature is what the agent *does* with the knowledge layer underneath it. Any agent can have a `/briefing` command. The difference is that this one produces grounded, cite-specific output because the constitutional architecture gives it charters, cross-cutting concerns, and invariants to reason against. Remove the knowledge layer and the same command produces generic summaries.
+**A note on what you're testing:** The features below are not plugins or custom tooling. They're capabilities that emerge from the knowledge layer — the constitution, charters, cross-cutting concerns, and procedures in the `docs/` directory. The agent reads these documents, reasons against them, and produces output that would be impossible from code inspection alone. Remove the knowledge layer and the same prompts produce generic results.
 
 ---
 
 ## Instant Orientation
 
-```
-/about
-```
+> "Tell me about this codebase."
 
 The agent produces a grounded executive summary of the entire codebase — in seconds, on a fresh session. It doesn't explore the file tree or read random files. It reads the constitution and synthesizes.
 
@@ -22,37 +20,31 @@ The agent produces a grounded executive summary of the entire codebase — in se
 
 ## Technical Briefing
 
-```
-/briefing enrollment lifecycle
-```
+> "Give me a briefing on the enrollment lifecycle."
 
 Ask for a briefing on any domain or flow. The agent produces a multi-section technical synthesis — architecture, risks, cross-cutting concerns — grounded in charters, not guesswork.
 
 **What to notice:** The agent cites specific functions, line numbers, and tripwire warnings. It knows where the dangers are before reading the code.
 
-Try: `/briefing grade cascade`, `/briefing discussion permissions`, `/briefing analytics caching`
+Try: "Briefing on the grade cascade", "Briefing on discussion permissions", "Briefing on analytics caching"
 
 ---
 
 ## Drift Detection
 
-```
-/peruse core/utils/grading.py
-```
+> "Peruse core/utils/grading.py — compare it against its charter."
 
 Point the agent at any file. It compares the actual code, line by line, against the charter that describes it. Discrepancies are flagged — renamed functions, moved line numbers, undocumented behavior.
 
 **What to notice:** The agent isn't just reading the file. It's reading the file *against a contract* and reporting violations. This is architectural drift detection, not code review.
 
-Try: `/peruse core/models.py`, `/peruse core/views_lib/courses/enrollment.py`
+Try: "Peruse core/models.py", "Peruse core/views_lib/courses/enrollment.py"
 
 ---
 
 ## Charter Audit
 
-```
-/review-charters
-```
+> "Review all charters against the codebase for accuracy."
 
 The agent audits every charter in the system against the actual codebase. This is a full accuracy review — it finds real discrepancies, stale line anchors, missing functions, and undocumented behavior.
 
@@ -61,8 +53,6 @@ The agent audits every charter in the system against the actual codebase. This i
 ---
 
 ## Formal Planning
-
-Ask the agent to plan a significant change:
 
 > "Write a formal plan for adding a peer review system where students can review each other's submissions."
 
@@ -90,7 +80,7 @@ The second agent reads the plan, evaluates it against the charters and cross-cut
 
 ## What You're Seeing
 
-These aren't plugins, extensions, or custom tooling. Every feature above is powered by markdown files in the `docs/` directory that agents read, reason against, and maintain.
+Every feature above is powered by markdown files in the `docs/` directory that agents read, reason against, and maintain.
 
 The constitutional architecture gives agents:
 - **Orientation** in seconds instead of minutes (constitution + dispatch table)
