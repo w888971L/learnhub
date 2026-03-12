@@ -4,6 +4,8 @@ Clone this repo. Open a session with any supported AI agent (Claude Code, Codex,
 
 No setup required beyond the agent itself. The constitutional architecture is already in the repo.
 
+**A note on skills:** Some features below are invoked via `/commands`. The commands themselves are thin wrappers — a few lines that point the agent at a procedure. The feature isn't the skill. The feature is what the agent *does* with the knowledge layer underneath it. Any agent can have a `/briefing` command. The difference is that this one produces grounded, cite-specific output because the constitutional architecture gives it charters, cross-cutting concerns, and invariants to reason against. Remove the knowledge layer and the same command produces generic summaries.
+
 ---
 
 ## Instant Orientation
