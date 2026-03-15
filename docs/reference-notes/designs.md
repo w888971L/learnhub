@@ -16,6 +16,7 @@
 - **`prototypes/inspector-general.md`** — formidable independent enforcer with an operator-defined mandate the team doesn't see
 - **`prototypes/outlier-detection.md`** — specialized enforcers that spot structural anomalies in the knowledge graph
 - **`prototypes/zoom.md`** — visual zoom interface for navigating the knowledge graph from domains down to code
+- **`prototypes/cloud-constitution.md`** — storing a synthetic constitution in Claude.ai project files, decoupling governance from the repo
 
 ## Relationship to Plans
 

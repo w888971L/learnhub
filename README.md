@@ -1,5 +1,9 @@
 # LearnHub
 
+> The industry is building bigger libraries and faster search engines for a librarian who does not keep a working notebook. The bet is that if retrieval is fast enough, orientation can be rebuilt on demand.
+>
+> This work starts from a different premise: retrieval is not the main bottleneck. **Orientation is.** The librarian is fast, can write, and can reorient quickly if she returns to a short notebook she has been maintaining as she works. Each conversation updates it. Returning to a topic marks it as important. A second librarian, who can read but not edit, audits it for drift. When she comes back the next morning, she is reoriented in seconds — not because the library is small, but because the notebook is exactly the right size.
+
 > **[Try the Features](FEATURES.md)** — clone the repo and experience constitutional architecture in action.
 >
 > **[Development Log](docs/dev-log.md)** — daily summaries of what changed and why.
