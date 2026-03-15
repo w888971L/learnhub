@@ -17,6 +17,7 @@
 - **`prototypes/outlier-detection.md`** — specialized enforcers that spot structural anomalies in the knowledge graph
 - **`prototypes/zoom.md`** — visual zoom interface for navigating the knowledge graph from domains down to code
 - **`prototypes/cloud-constitution.md`** — storing a synthetic constitution in Claude.ai project files, decoupling governance from the repo
+- **`prototypes/librarian-analogy.md`** — three-role analogy (reader, librarian, auditor) for communicating orientation-over-retrieval
 
 ## Relationship to Plans
 
